@@ -1,0 +1,14 @@
+*.pyc
+*.cache
+*#*
+*.egg-info
+*.egg
+*.iml
+.DS_Store
+.ropeproject
+.idea
+build
+_build
+dist
+env
+.venv
