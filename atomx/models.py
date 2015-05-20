@@ -33,14 +33,20 @@ class AtomxModel(object):
         return self._attributes
 
     def save(self, session=None):
-        if not session and not self.session:
+        session = session or self.session
+        if not session:
             raise NoSessionError
-        return self.session.post(self.__class__.__name__, json=self._dirty_json)
+        res = session.post(self.__class__.__name__, json=self.json)
+        self.__init__(session=session, **res)
+        return self
 
     def update(self, session=None):
-        if not session and not self.session:
+        session = session or self.session
+        if not session:
             raise NoSessionError
-        return self.session.put(self.__class__.__name__, self.id, json=self._dirty_json)
+        res = self.session.put(self.__class__.__name__, self.id, json=self._dirty_json)
+        self.__init__(session=session, **res)
+        return self
 
     def delete(self, session=None):
         if not session and not self.session:

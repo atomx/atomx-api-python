@@ -16,9 +16,11 @@ __version__ = VERSION
 __author__ = 'Spot Media Solutions Sdn. Bhd.'
 __copyright__ = 'Copyright 2015 Spot Media Solutions Sdn. Bhd.'
 
+API_ENDPOINT = 'http://api.atomx.com/{}/'.format(API_VERSION)
+
 
 class Atomx(object):
-    def __init__(self, email, password, api_endpoint='http://api.atomx.com/{}/'.format(API_VERSION)):
+    def __init__(self, email, password, api_endpoint=API_ENDPOINT):
         self.email = email
         self.password = password
         self.api_endpoint = api_endpoint
@@ -48,25 +50,40 @@ class Atomx(object):
             raise APIError(r.json()['error'])
         return r.json()['search']
 
-    def get(self, model, **kwargs):
-        model = get_model_name(model)
-        if not model:
-            raise ModelNotFoundError()
-        r = self.session.get(self.api_endpoint + model, params=kwargs)
+    def get(self, resource, **kwargs):
+        r = self.session.get(self.api_endpoint + resource, params=kwargs)
         if not r.ok:
             raise APIError(r.json()['error'])
 
         r_json = r.json()
-        model_name = model.lower()
-        if model_name in r_json:
-            return getattr(models, model)(self, **r_json[model_name])
-        return [getattr(models, model)(self, **m) for m in r_json[model_name + 's']]
+        model_name = r_json['resource']
+        res = r_json[model_name]
+        model = get_model_name(model_name)
+        if model:
+            if isinstance(res, list):
+                return [getattr(models, model)(self, **m) for m in res]
+            return getattr(models, model)(self, **res)
+        return res
 
     def post(self, model, json, **kwargs):
-        return self.session.post(self.api_endpoint + model, json=json, params=kwargs)
+        r = self.session.post(self.api_endpoint + model, json=json, params=kwargs)
+        r_json = r.json()
+        if not r.ok:
+            raise APIError(r_json['error'])
+        return r_json[r_json['resource']]
 
     def put(self, model, id, json, **kwargs):
-        return self.session.put(self.api_endpoint + model + '/' + str(id), json=json, params=kwargs)
+        r = self.session.put(self.api_endpoint + model + '/' + str(id), json=json, params=kwargs)
+        r_json = r.json()
+        if not r.ok:
+            raise APIError(r_json['error'])
+        return r_json[r_json['resource']]
 
     def delete(self, model, id, json, **kwargs):
         return self.session.put(self.api_endpoint + model + '/' + str(id), json=json, params=kwargs)
+
+    def save(self, model):
+        return model.save(self)
+
+    def update(self, model):
+        return model.update(self)
