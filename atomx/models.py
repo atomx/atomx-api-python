@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .exceptions import NoSessionError
-
+from .exceptions import NoSessionError, ModelNotFoundError
 
 __all__ = ['Advertiser', 'Campaign', 'Creative', 'Fallback', 'Network', 'Placement', 'Profile',
            'Publisher', 'Segment', 'Site', 'User']
@@ -44,14 +43,26 @@ class AtomxModel(object):
         session = session or self.session
         if not session:
             raise NoSessionError
-        res = self.session.put(self.__class__.__name__, self.id, json=self._dirty_json)
+        res = session.put(self.__class__.__name__, self.id, json=self._dirty_json)
         self.__init__(session=session, **res)
         return self
 
     def delete(self, session=None):
-        if not session and not self.session:
+        session = session or self.session
+        if not session:
             raise NoSessionError
-        return self.session.delete(self.__class__.__name__, self.id, json=self._dirty_json)
+        return session.delete(self.__class__.__name__, self.id, json=self._dirty_json)
+
+    def reload(self, session=None):
+        session = session or self.session
+        if not session:
+            raise NoSessionError
+        if not hasattr(self, 'id'):
+            raise ModelNotFoundError("Can't reload without 'id' parameter. "
+                                     "Forgot to save() first?")
+        res = session.get(self.__class__.__name__ + '/' + str(self.id))
+        self.__init__(session=session, **res.json)
+        return self
 
 
 for m in __all__:
