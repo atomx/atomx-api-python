@@ -3,6 +3,7 @@
 import requests
 from .version import API_VERSION, VERSION
 from . import models
+from .utils import get_model_name
 from .exceptions import (
     APIError,
     ModelNotFoundError,
@@ -48,7 +49,8 @@ class Atomx(object):
         return r.json()['search']
 
     def get(self, model, **kwargs):
-        if model not in dir(models):
+        model = get_model_name(model)
+        if not model:
             raise ModelNotFoundError()
         r = self.session.get(self.api_endpoint + model, params=kwargs)
         if not r.ok:
