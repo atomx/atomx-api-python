@@ -48,7 +48,14 @@ class Atomx(object):
         r = self.session.get(self.api_endpoint + 'search', params={'q': query})
         if not r.ok:
             raise APIError(r.json()['error'])
-        return r.json()['search']
+        search_result = r.json()['search']
+        # convert publisher, creative dicts etc from search result to Atomx.model
+        for m in search_result.keys():
+            model_name = get_model_name(m)
+            if model_name:
+                search_result[m] = [getattr(models, model_name)(self, **v)
+                                    for v in search_result[m]]
+        return search_result
 
     def get(self, resource, **kwargs):
         r = self.session.get(self.api_endpoint + resource, params=kwargs)

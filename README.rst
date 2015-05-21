@@ -48,6 +48,17 @@ Example Usage:
     profiles[0].update()
 
 
+    # working with search
+    s = atomx.search('mini*')
+    # s is now a dict with lists of search results for the different models
+    # with the model id and name
+
+    publisher = s['publisher'][0]  # get the first publisher..
+    publisher.reload()  # .. and load all the data
+    print(publisher)  # now all publisher data is there
+
+
+
 Installation
 ------------
 
