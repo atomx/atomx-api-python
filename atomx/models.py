@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from .exceptions import NoSessionError, ModelNotFoundError
+from .exceptions import NoSessionError, ModelNotFoundError, APIError
 
-__all__ = ['Advertiser', 'Campaign', 'Creative', 'Fallback', 'Network', 'Placement', 'Profile',
-           'Publisher', 'Segment', 'Site', 'User']
+__all__ = ['Advertiser', 'Campaign', 'Creative', 'Fallback', 'Network', 'Placement',
+           'Profile', 'Publisher', 'Segment', 'Site', 'User']
 
 
 class AtomxModel(object):
@@ -13,6 +13,15 @@ class AtomxModel(object):
         super(AtomxModel, self).__setattr__('_dirty', set())  # list of changed attributes
 
     def __getattr__(self, item):
+        # if item not in model and session exists,
+        # try to load model attribute from server if possible
+        if not item.startswith('_') and item not in self._attributes and self.session:
+            try:
+                v = self.session.get(self.__class__.__name__ + '/' +
+                                     str(self.id) + '/' + str(item))
+                self._attributes[item] = v
+            except APIError as e:
+                raise AttributeError(e)
         return self._attributes.get(item)
 
     def __setattr__(self, key, value):
