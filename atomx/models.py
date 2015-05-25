@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import pprint
 from .exceptions import NoSessionError, ModelNotFoundError, APIError
 
-__all__ = ['Advertiser', 'Campaign', 'Creative', 'Fallback', 'Network', 'Placement',
-           'Profile', 'Publisher', 'Segment', 'Site', 'User']
+__all__ = ['Advertiser', 'Bidder', 'Browser', 'Campaign', 'Category', 'ConnectionType',
+           'ConversionPixel', 'Country', 'Creative', 'Datacenter', 'DeviceType',
+           'Domain', 'Fallback', 'Isp', 'Languages', 'Network', 'OperatingSystem',
+           'Placement', 'Profile', 'Publisher', 'Reason', 'Segment', 'Seller',
+           'Site', 'Size', 'User']
 
 
 class AtomxModel(object):
@@ -41,7 +45,7 @@ class AtomxModel(object):
             self._dirty.add(key)
 
     def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, self._attributes)
+        return '{}({})'.format(self.__class__.__name__, pprint.pformat(self.json))
 
     @property
     def _dirty_json(self):
