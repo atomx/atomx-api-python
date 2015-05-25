@@ -1,4 +1,6 @@
+import re
 from . import models
+
 
 def get_model_name(name):
     """Checks that :param:`name` is a valid model.
@@ -34,3 +36,13 @@ def get_model_name(name):
     if model_name in dir(models):
         return model_name
     return False
+
+
+def get_attribute_model_name(attribute):
+    """Checks if an attribute is a valid model like :func:`get_model_name`
+    but also strips '_filter', '_include', '_exclude'
+
+    :param str attribute: attribute name to convert
+    :return: name of the model or False
+    """
+    return get_model_name(re.sub('(_filter|_include|_exclude)$', '', attribute))

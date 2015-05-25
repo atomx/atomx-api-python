@@ -13,6 +13,17 @@ class AtomxModel(object):
         super(AtomxModel, self).__setattr__('_dirty', set())  # list of changed attributes
 
     def __getattr__(self, item):
+        from .utils import get_attribute_model_name
+        model_name = get_attribute_model_name(item)
+        attr = self._attributes.get(item)
+        # if requested attribute item is a valid model name and and int or
+        # a list of integers, just delete the attribute so it gets
+        # fetched from the api
+        if model_name and (isinstance(attr, int) or
+                           isinstance(attr, list) and len(attr) > 0 and
+                           isinstance(attr[0], int)):
+            del self._attributes[item]
+
         # if item not in model and session exists,
         # try to load model attribute from server if possible
         if not item.startswith('_') and item not in self._attributes and self.session:

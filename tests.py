@@ -4,7 +4,7 @@ import pytest
 @pytest.fixture(scope="session")
 def atomx():
     from .atomx import Atomx
-    return Atomx('daniel@atomx.com', 'password')
+    return Atomx('daniel@atomx.com', 'password', 'http://127.0.0.1:6543/v1/')
 
 
 def test_limit(atomx):

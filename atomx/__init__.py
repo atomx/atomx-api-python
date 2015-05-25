@@ -16,7 +16,7 @@ __version__ = VERSION
 __author__ = 'Spot Media Solutions Sdn. Bhd.'
 __copyright__ = 'Copyright 2015 Spot Media Solutions Sdn. Bhd.'
 
-API_ENDPOINT = 'http://api.atomx.com/{}/'.format(API_VERSION)
+API_ENDPOINT = 'https://api.atomx.com/{}/'.format(API_VERSION)
 
 
 class Atomx(object):
