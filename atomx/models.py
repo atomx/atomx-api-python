@@ -55,7 +55,7 @@ class AtomxModel(object):
     def json(self):
         return self._attributes
 
-    def save(self, session=None):
+    def create(self, session=None):
         session = session or self.session
         if not session:
             raise NoSessionError
@@ -64,6 +64,9 @@ class AtomxModel(object):
         return self
 
     def update(self, session=None):
+        return self.save(session)
+
+    def save(self, session=None):
         session = session or self.session
         if not session:
             raise NoSessionError
