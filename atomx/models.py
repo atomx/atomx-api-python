@@ -40,7 +40,7 @@ class AtomxModel(object):
         return self._attributes.get(item)
 
     def __setattr__(self, key, value):
-        if self._attributes[key] != value:
+        if self._attributes.get(key) != value:
             self._attributes[key] = value
             self._dirty.add(key)
 
