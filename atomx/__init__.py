@@ -57,6 +57,36 @@ class Atomx(object):
                                     for v in search_result[m]]
         return search_result
 
+    def report(self, **kwargs):
+        kwargs['from'] = kwargs['from_']
+        del kwargs['from_']
+        r = self.session.post(self.api_endpoint + 'report', json=kwargs)
+        if not r.ok:
+            raise APIError(r.json()['error'])
+        return models.Report(self, query=r.json()['query'], **r.json()['report'])
+
+    def report_status(self, report):
+        if isinstance(report, models.Report):
+            report_id = report.id
+        else:
+            report_id = report
+
+        r = self.session.get(self.api_endpoint + 'report/' + report_id, params={'status': True})
+        if not r.ok:
+            raise APIError(r.json()['error'])
+        return r.json()['report']
+
+    def report_get(self, report):
+        if isinstance(report, models.Report):
+            report_id = report.id
+        else:
+            report_id = report
+
+        r = self.session.get(self.api_endpoint + 'report/' + report_id)
+        if not r.ok:
+            raise APIError(r.json()['error'])
+        return r.content.decode()
+
     def get(self, resource, **kwargs):
         r = self.session.get(self.api_endpoint + resource, params=kwargs)
         if not r.ok:

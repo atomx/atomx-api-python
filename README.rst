@@ -58,6 +58,23 @@ Example Usage:
     print(publisher)  # now all publisher data is there
 
 
+    # reporting example
+    # get a report for a specific publisher
+    report = atomx.report(type='publisher', sums=['impressions', 'clicks'], groups=['hour'], where=[['publisher_id', '==', 42]], from_='2015-02-08 00:00:00Z', to='2015-02-09 00:00:00Z')
+    # check if report is ready
+    print(report.is_ready)
+    # if pandas is installed you can get the pandas dataframe with `report.pandas`
+    # you can also get the report csv in `report.content` without pandas
+    df = report.pandas
+    # set index to datetime
+    import pandas as pd
+    df.index = pd.to_datetime(df.pop('hour'))
+    # resample per day
+    means = df.resample('D', how=['mean', 'median', 'std'])
+    # and plot impression and clicks per day
+    means['impressions'].plot()
+    means['clicks'].plot()
+
 
 Installation
 ------------
@@ -68,3 +85,8 @@ To install the python atomx api, simply:
 
     $ pip install atomx
 
+or if you want to use ipython notebook and reporting functionality:
+
+.. code-block:: bash
+
+    $ pip install atomx[report]

@@ -9,3 +9,9 @@ class APIError(Exception):
 
 class ModelNotFoundError(Exception):
     pass
+
+class ReportNotReadyError(Exception):
+    pass
+
+class NoPandasInstalledError(Exception):
+    pass

@@ -15,6 +15,11 @@ from distutils.core import setup
 requires = [
     'requests',
 ]
+extra_require={
+    'report': ['ipython[notebook]', 'pandas', 'matplotlib'],
+    'test': ['pytest'],
+    'docs': ['sphinx'],
+}
 
 setup(
     name='atomx',
@@ -42,8 +47,5 @@ setup(
     keywords='atomx rest api',
 
     install_requires=requires,
-    extra_require={
-        'test': 'pytest',
-        'docs': 'sphinx',
-    }
+    extra_require=extra_require,
 )

@@ -1,7 +1,17 @@
 # -*- coding: utf-8 -*-
 
 import pprint
-from .exceptions import NoSessionError, ModelNotFoundError, APIError
+try:  # py3
+    from io import StringIO
+except ImportError:  # py2
+    from StringIO import StringIO
+from .exceptions import (
+    NoSessionError,
+    ModelNotFoundError,
+    APIError,
+    ReportNotReadyError,
+    NoPandasInstalledError,
+)
 
 __all__ = ['Advertiser', 'Bidder', 'Browser', 'Campaign', 'Category', 'ConnectionType',
            'ConversionPixel', 'Country', 'Creative', 'Datacenter', 'DeviceType',
@@ -94,3 +104,45 @@ class AtomxModel(object):
 
 for m in __all__:
     locals()[m] = type(m, (AtomxModel,), {})
+
+
+class Report(object):
+    def __init__(self, session, id, fast, status, lines, query, **kwargs):
+        self.session = session
+        self.id = id
+        self.fast = fast
+        self.status = status
+        self.lines = lines
+        self.query = query
+
+    @property
+    def is_ready(self):
+        if hasattr(self, '_is_ready'):
+            return self._is_ready
+        report_status = self.session.report_status(self)
+        self.status = report_status['status']
+        self.lines = report_status['lines']
+        if self.status == 'SUCCESS':
+            setattr(self, '_is_ready', True)
+            return True
+        elif self.status == 'ERROR':
+            setattr(self, '_is_ready', True)
+        return False
+
+    @property
+    def content(self):
+        if not self.is_ready:
+            raise ReportNotReadyError()
+        return self.session.report_get(self)
+
+    @property
+    def pandas(self):
+        try:
+            import pandas as pd
+        except ImportError:
+            raise NoPandasInstalledError('To get the report as a pandas dataframe you '
+                                         'have to have pandas installed. '
+                                         'Do `pip install pandas` in your command line.')
+
+        return pd.read_csv(StringIO(self.content),
+                           names=self.query.get('groups', []) + self.query.get('sums', []))
