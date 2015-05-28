@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
 import requests
 from .version import API_VERSION, VERSION
 from . import models
@@ -58,7 +59,14 @@ class Atomx(object):
         return search_result
 
     def report(self, **kwargs):
-        kwargs['from'] = kwargs['from_']
+        if 'to' not in kwargs:
+            kwargs['to'] = datetime.now()
+        if isinstance(kwargs['to'], datetime):  # TODO: support timezones
+            kwargs['to'] = kwargs['to'].strftime("%Y-%m-%d %H:00:00Z")
+        if isinstance(kwargs.get('from_'), datetime):
+            kwargs['from'] = kwargs['from_'].strftime("%Y-%m-%d %H:00:00Z")
+        else:
+            kwargs['from'] = kwargs['from_']
         del kwargs['from_']
         r = self.session.post(self.api_endpoint + 'report', json=kwargs)
         if not r.ok:
