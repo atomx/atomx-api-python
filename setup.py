@@ -10,7 +10,6 @@ with open(path.join(here, 'CHANGES.txt')) as f:
 with open(path.join(here, 'atomx', 'version.py')) as f:
     exec(f.read())  # defines VERSION and API_VERSION
 
-from distutils.core import setup
 
 requires = [
     'requests',
@@ -29,12 +28,13 @@ setup(
     long_description=README + '\n\n' + CHANGES,
 
     packages=find_packages(),
+    exclude_package_data={'': ['.gitignore']},
     zip_safe=True,
-    url='https://github.com/atomx/atomx-api-python',
-    license='ISC',
+
     author='Spot Media Solutions Sdn. Bhd.',
     author_email='daniel@atomx.com',
-
+    url='https://github.com/atomx/atomx-api-python',
+    license='ISC',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
@@ -46,6 +46,7 @@ setup(
     ],
     keywords='atomx rest api',
 
+    setup_requires=['setuptools_git'],
     install_requires=requires,
     extra_require=extra_require,
 )
