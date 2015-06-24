@@ -58,17 +58,41 @@ class Atomx(object):
                                     for v in search_result[m]]
         return search_result
 
-    def report(self, **kwargs):
-        if 'to' not in kwargs:
-            kwargs['to'] = datetime.now()
-        if isinstance(kwargs['to'], datetime):  # TODO: support timezones
-            kwargs['to'] = kwargs['to'].strftime("%Y-%m-%d %H:00:00Z")
-        if isinstance(kwargs.get('from_'), datetime):
-            kwargs['from'] = kwargs['from_'].strftime("%Y-%m-%d %H:00:00Z")
+    def report(self, scope, groups, sums, where, from_, to=None, timezone='UTC', fast=True):
+        """Create a report.
+
+        :param str scope: either 'advertiser' or 'publisher' to select the type of report.
+        :param list groups: columns to group by (see http://wiki.atomx.com/doku.php?id=reporting#groups)
+        :param list sums: columns to sum on (see http://wiki.atomx.com/doku.php?id=reporting#sums)
+        :param list where: is a list of expression lists.
+            An expression list is in the form of `[column, op, value]`.
+            `column` can be any of the :param:`groups` or :param:`sums` columns.
+            `op` can be any of `==`, `!=`, `<=`, `>=`, `<`, `>`, `in` or `not in` as a string.
+            `value` is either a number or in case of `in` and `not in` a list of numbers.
+        :param datetime from_: `datetime` where the report should start (inclusive)
+        :param datetime to: `datetime` where the report should end (exclusive).
+            (defaults to `datetime.now()` if undefined)
+        :param str timezone:  Timezone used for all times. (defaults to `UTC`)
+            For a supported list see http://wiki.atomx.com/doku.php?id=timezones
+        :param bool fast: if `False` the report will always be run against the low level data.
+            This is useful for billing reports for example.
+            The default is `True` which means it will always try to use aggregate data
+            to speed up the query.
+        :return: A :class:`atomx.models.Report` model
+        """
+        report_json = locals().copy()
+        del report_json['self']
+
+        if to is None:
+            report_json['to'] = datetime.now()
+        if isinstance(report_json['to'], datetime):
+            report_json['to'] = report_json['to'].strftime("%Y-%m-%d %H:00:00")
+        if isinstance(report_json.get('from_'), datetime):
+            report_json['from'] = report_json['from_'].strftime("%Y-%m-%d %H:00:00")
         else:
-            kwargs['from'] = kwargs['from_']
-        del kwargs['from_']
-        r = self.session.post(self.api_endpoint + 'report', json=kwargs)
+            report_json['from'] = report_json['from_']
+        del report_json['from_']
+        r = self.session.post(self.api_endpoint + 'report', json=report_json)
         if not r.ok:
             raise APIError(r.json()['error'])
         return models.Report(self, query=r.json()['query'], **r.json()['report'])
