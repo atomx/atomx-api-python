@@ -17,14 +17,14 @@ __version__ = VERSION
 __author__ = 'Spot Media Solutions Sdn. Bhd.'
 __copyright__ = 'Copyright 2015 Spot Media Solutions Sdn. Bhd.'
 
-API_ENDPOINT = 'https://api.atomx.com/{}/'.format(API_VERSION)
+API_ENDPOINT = 'https://api.atomx.com/{}'.format(API_VERSION)
 
 
 class Atomx(object):
     def __init__(self, email, password, api_endpoint=API_ENDPOINT):
         self.email = email
         self.password = password
-        self.api_endpoint = api_endpoint
+        self.api_endpoint = api_endpoint.rstrip('/') + '/'
         self.session = requests.Session()
         self.login()
 
@@ -96,7 +96,7 @@ class Atomx(object):
         return r.content.decode()
 
     def get(self, resource, **kwargs):
-        r = self.session.get(self.api_endpoint + resource, params=kwargs)
+        r = self.session.get(self.api_endpoint + resource.strip('/'), params=kwargs)
         if not r.ok:
             raise APIError(r.json()['error'])
 
@@ -111,21 +111,24 @@ class Atomx(object):
         return res
 
     def post(self, model, json, **kwargs):
-        r = self.session.post(self.api_endpoint + model, json=json, params=kwargs)
+        r = self.session.post(self.api_endpoint + model.strip('/'),
+                              json=json, params=kwargs)
         r_json = r.json()
         if not r.ok:
             raise APIError(r_json['error'])
         return r_json[r_json['resource']]
 
     def put(self, model, id, json, **kwargs):
-        r = self.session.put(self.api_endpoint + model + '/' + str(id), json=json, params=kwargs)
+        r = self.session.put(self.api_endpoint + model.strip('/') + '/' + str(id),
+                             json=json, params=kwargs)
         r_json = r.json()
         if not r.ok:
             raise APIError(r_json['error'])
         return r_json[r_json['resource']]
 
     def delete(self, model, id, json, **kwargs):
-        return self.session.put(self.api_endpoint + model + '/' + str(id), json=json, params=kwargs)
+        return self.session.put(self.api_endpoint + model.strip('/') + '/' + str(id),
+                                json=json, params=kwargs)
 
     def save(self, model):
         return model.save(self)
