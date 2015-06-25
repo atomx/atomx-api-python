@@ -54,6 +54,10 @@ class AtomxModel(object):
             self._attributes[key] = value
             self._dirty.add(key)
 
+    def __dir__(self):
+        """Manually add dynamic attributes for autocomplete"""
+        return dir(type(self)) + list(self.__dict__.keys()) + list(self._attributes.keys())
+
     def __repr__(self):
         return '{}({})'.format(self.__class__.__name__, pprint.pformat(self.json))
 
