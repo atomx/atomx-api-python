@@ -1,10 +1,12 @@
-atomx api README
+Python Atomx Api
 ================
 
-Simple interface for the atomx rest api.
+Interface for the atomx rest api.
+`atomx wiki <http://wiki.atomx.com/doku.php?id=api>`_
 
-Example Usage:
---------------
+
+Example Usage
+-------------
 
 .. code-block:: python
 
@@ -60,7 +62,7 @@ Example Usage:
 
     # reporting example
     # get a report for a specific publisher
-    report = atomx.report(type='publisher', sums=['impressions', 'clicks'], groups=['hour'], where=[['publisher_id', '==', 42]], from_='2015-02-08 00:00:00Z', to='2015-02-09 00:00:00Z')
+    report = atomx.report(type='publisher', sums=['impressions', 'clicks'], groups=['hour'], where=[['publisher_id', '==', 42]], from_='2015-02-08 00:00:00', to='2015-02-09 00:00:00', timezone='America/Los_Angeles')
     # check if report is ready
     print(report.is_ready)
     # if pandas is installed you can get the pandas dataframe with `report.pandas`

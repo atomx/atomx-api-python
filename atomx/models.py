@@ -5,7 +5,7 @@ try:  # py3
     from io import StringIO
 except ImportError:  # py2
     from StringIO import StringIO
-from .exceptions import (
+from atomx.exceptions import (
     NoSessionError,
     ModelNotFoundError,
     APIError,
@@ -21,7 +21,17 @@ __all__ = ['Advertiser', 'Bidder', 'Browser', 'Campaign', 'Category', 'Connectio
 
 
 class AtomxModel(object):
+    """Atomx model for {model}. test
+    :param session: session
+    :param attributes: attributes
+    :return: model.{model}
+    """
     def __init__(self, session=None, **attributes):
+        """Atomx model for {model}. test
+        :param session: session
+        :param attributes: attributes
+        :return: model.{model}
+        """
         super(AtomxModel, self).__setattr__('session', session)
         super(AtomxModel, self).__setattr__('_attributes', attributes)
         super(AtomxModel, self).__setattr__('_dirty', set())  # list of changed attributes
@@ -89,10 +99,11 @@ class AtomxModel(object):
         return self
 
     def delete(self, session=None):
-        session = session or self.session
-        if not session:
-            raise NoSessionError
-        return session.delete(self.__class__.__name__, self.id, json=self._dirty_json)
+        """Delete is currently not supported by the api.
+        Set `state` to `INACTIVE` to deactivate it.
+        """
+        raise NotImplementedError("Delete is currently not supported by the api."
+                                  "Set `state` to `INACTIVE` to deactivate it.")
 
     def reload(self, session=None):
         session = session or self.session
@@ -107,31 +118,55 @@ class AtomxModel(object):
 
 
 for m in __all__:
-    locals()[m] = type(m, (AtomxModel,), {})
+    locals()[m] = type(m, (AtomxModel,),
+                       {'__doc__': ':class:`.AtomxModel` for {}'.format(m)})
 
 
 class Report(object):
-    def __init__(self, session, id, fast, status, lines, query, **kwargs):
+    def __init__(self, session, query, fast, id, lines, error, link,
+                 started, finished, is_ready, duration, **kwargs):
         self.session = session
-        self.id = id
-        self.fast = fast
-        self.status = status
-        self.lines = lines
         self.query = query
+        self.fast = fast
+        self.id = id
+        self.lines = lines
+        self.error = error
+        self.link = link
+        self.started = started
+        self.finished = finished
+        self.duration = duration
+
+        if is_ready:
+            self._is_ready = is_ready
 
     @property
     def is_ready(self):
         if hasattr(self, '_is_ready'):
             return self._is_ready
         report_status = self.session.report_status(self)
-        self.status = report_status['status']
-        self.lines = report_status['lines']
-        if self.status == 'SUCCESS':
-            setattr(self, '_is_ready', True)
+        # update attributes
+        for s in ['error', 'lines', 'started', 'finished', 'duration']:
+            setattr(self, s, report_status[s])
+        # don't query status again if report is ready
+        if report_status['is_ready']:
+            self._is_ready = True
             return True
-        elif self.status == 'ERROR':
-            setattr(self, '_is_ready', True)
         return False
+
+    def reload(self, session=None):
+        self.session = session or self.session
+        return self.status
+
+    @property
+    def status(self):
+        if not self.session:
+            raise NoSessionError
+        if not hasattr(self, 'id'):
+            raise ModelNotFoundError("Can't get status without 'id'. "
+                                     "Create a report with :meth:`atomx.Atomx.report_get`.")
+        status = self.session.report_status(self)
+        self.__init__(session=self.session, **status)
+        return self
 
     @property
     def content(self):

@@ -1,5 +1,5 @@
 import re
-from . import models
+from atomx import models
 
 
 def get_model_name(name):

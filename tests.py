@@ -20,9 +20,9 @@ def test_update(atomx):
     assert creative.title == NEW_TITLE
 
 
-def test_save(atomx):
+def test_create(atomx):
     from atomx.models import Profile
-    profile = Profile(advertiser_id=23, name='test advertiser')
-    profile.save()
-    profile_new = atomx.get(Profile, id=profile.id)
+    profile = Profile(advertiser_id=23, name='test profile')
+    profile.create(atomx)
+    profile_new = atomx.get('profile', id=profile.id)
     assert profile.name == profile_new.name
