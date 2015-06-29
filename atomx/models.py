@@ -21,10 +21,10 @@ __all__ = ['Advertiser', 'Bidder', 'Browser', 'Campaign', 'Category', 'Connectio
 
 
 class AtomxModel(object):
-    """Atomx model for {model}. test
-    :param session: session
-    :param attributes: attributes
-    :return: model.{model}
+    """A generic atomx model that the other models from :mod:`atomx.models` inherit from.
+
+    :param atomx.Atomx session: The :class:`atomx.Atomx` session to use for the api requests.
+    :param attributes: model attributes
     """
     def __init__(self, session=None, **attributes):
         """Atomx model for {model}. test
@@ -77,9 +77,17 @@ class AtomxModel(object):
 
     @property
     def json(self):
+        """Returns the model attributes as :class:`dict`."""
         return self._attributes
 
     def create(self, session=None):
+        """`POST` the model to the api and populates attributes with api response.
+
+        :param session: The :class:`atomx.Atomx` session to use for the api call.
+            (Optional if you specified a `session` at initialization)
+        :return: ``self``
+        :rtype: :class:`.AtomxModel`
+        """
         session = session or self.session
         if not session:
             raise NoSessionError
@@ -88,9 +96,17 @@ class AtomxModel(object):
         return self
 
     def update(self, session=None):
+        """Alias for :meth:`.AtomxModel.save`."""
         return self.save(session)
 
     def save(self, session=None):
+        """`PUT` the model to the api and update attributes with api response.
+
+        :param session: The :class:`atomx.Atomx` session to use for the api call.
+            (Optional if you specified a `session` at initialization)
+        :return: ``self``
+        :rtype: :class:`.AtomxModel`
+        """
         session = session or self.session
         if not session:
             raise NoSessionError
@@ -106,6 +122,16 @@ class AtomxModel(object):
                                   "Set `state` to `INACTIVE` to deactivate it.")
 
     def reload(self, session=None):
+        """Reload the model from the api and update attributes with the response.
+
+        This is useful if you have not all attributes loaded like when you made
+        an api request with the `attributes` parameter or you used :meth:`atomx.Atomx.search`.
+
+        :param session: The :class:`atomx.Atomx` session to use for the api call.
+            (Optional if you specified a `session` at initialization)
+        :return: ``self``
+        :rtype: :class:`.AtomxModel`
+        """
         session = session or self.session
         if not session:
             raise NoSessionError
@@ -123,6 +149,8 @@ for m in __all__:
 
 
 class Report(object):
+    """Represents a `report` you get back from :meth:`atomx.Atomx.report`."""
+
     def __init__(self, session, query, fast, id, lines, error, link,
                  started, finished, is_ready, duration, **kwargs):
         self.session = session
@@ -141,6 +169,7 @@ class Report(object):
 
     @property
     def is_ready(self):
+        """Returns ``True`` if the :class:`.Report` is ready, ``False`` otherwise."""
         if hasattr(self, '_is_ready'):
             return self._is_ready
         report_status = self.session.report_status(self)
@@ -154,11 +183,13 @@ class Report(object):
         return False
 
     def reload(self, session=None):
+        """Reload the `report` status. (alias for :meth:`Report.status`)."""
         self.session = session or self.session
         return self.status
 
     @property
     def status(self):
+        """Reload the :class:`Report` status"""
         if not self.session:
             raise NoSessionError
         if not hasattr(self, 'id'):
@@ -170,12 +201,14 @@ class Report(object):
 
     @property
     def content(self):
+        """Returns the content (csv) of the `report`."""
         if not self.is_ready:
             raise ReportNotReadyError()
         return self.session.report_get(self)
 
     @property
     def pandas(self):
+        """Returns the content of the `report` as a pandas data frame."""
         try:
             import pandas as pd
         except ImportError:
