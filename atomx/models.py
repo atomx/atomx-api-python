@@ -216,5 +216,5 @@ class Report(object):
                                          'have to have pandas installed. '
                                          'Do `pip install pandas` in your command line.')
 
-        return pd.read_csv(StringIO(self.content),
+        return pd.read_csv(StringIO(self.content), sep='\t',
                            names=self.query.get('groups', []) + self.query.get('sums', []))

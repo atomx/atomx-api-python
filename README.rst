@@ -27,19 +27,19 @@ Example Usage
     creative = creatives[0]
     creative.title = 'shiny new title'
     # the session is inherited from `atomx` that made the get request
-    creative.update()
+    creative.save()
 
 
     # create a new profile
     from atomx.models import Profile
     profile = Profile(advertiser_id=23, name='test profile')
-    # Note that you have to pass it a valid `Atomx` session for save
-    # or use `atomx.save(profile)`
-    profile.save(atomx)
+    # Note that you have to pass it a valid `Atomx` session for create
+    # or use `atomx.create(profile)`
+    profile.create(atomx)
 
     # now you could alter and update it like the creative above
     profile.name = 'changed name'
-    profile.update()
+    profile.save()
 
 
     # you can also get attributes
@@ -47,7 +47,7 @@ Example Usage
     # profiles is now a list of `atomx.models.Profile` that you can
     # read, update, etc again.
     profiles[0].click_frequency_cap_per = 86400
-    profiles[0].update()
+    profiles[0].save()
 
 
     # working with search
@@ -62,7 +62,7 @@ Example Usage
 
     # reporting example
     # get a report for a specific publisher
-    report = atomx.report(type='publisher', sums=['impressions', 'clicks'], groups=['hour'], where=[['publisher_id', '==', 42]], from_='2015-02-08 00:00:00', to='2015-02-09 00:00:00', timezone='America/Los_Angeles')
+    report = atomx.report(scope='publisher', groups=['hour_formatted'], sums=['impressions', 'clicks'], where=[['publisher_id', '==', 42]], from_='2015-02-08 00:00:00', to='2015-02-09 00:00:00', timezone='America/Los_Angeles')
     # check if report is ready
     print(report.is_ready)
     # if pandas is installed you can get the pandas dataframe with `report.pandas`
@@ -70,9 +70,9 @@ Example Usage
     df = report.pandas
     # set index to datetime
     import pandas as pd
-    df.index = pd.to_datetime(df.pop('hour'))
-    # resample per day
-    means = df.resample('D', how=['mean', 'median', 'std'])
+    df.index = pd.to_datetime(df.pop('hour_formatted'))
+    # calculate mean, median, std per hour
+    means = df.resample('H', how=['mean', 'median', 'std'])
     # and plot impression and clicks per day
     means['impressions'].plot()
     means['clicks'].plot()

@@ -24,7 +24,7 @@ setup(
     name='atomx',
     version=VERSION,
 
-    description='python interface for the https://api.atomx.com',
+    description='python interface for the atomx api on https://api.atomx.com',
     long_description=README + '\n\n' + CHANGES,
 
     packages=find_packages(),
