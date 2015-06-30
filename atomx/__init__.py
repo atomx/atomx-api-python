@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
+from datetime import (
+    datetime,
+    timedelta,
+)
 import requests
 from atomx.version import API_VERSION, VERSION
 from atomx import models
@@ -9,6 +12,7 @@ from atomx.exceptions import (
     APIError,
     ModelNotFoundError,
     InvalidCredentials,
+    MissingArgumentError,
 )
 
 
@@ -109,13 +113,16 @@ class Atomx(object):
                                     for v in search_result[m]]
         return search_result
 
-    def report(self, scope, groups, sums, where, from_, to=None, timezone='UTC', fast=True):
+    def report(self, scope=None, groups=None, sums=None, where=None,
+               from_=None, to=None, timezone='UTC', fast=True):
         """Create a report.
 
         See the `reporting atomx wiki <http://wiki.atomx.com/doku.php?id=reporting>`_
         for details about parameters and available groups, sums.
 
         :param str scope: either 'advertiser' or 'publisher' to select the type of report.
+            If undefined but the groups column have an unambiguous attribute that's
+            unique to a certain scope, it's set automatically.
         :param list groups: columns to group by.
         :param list sums: columns to sum on.
         :param list where: is a list of expression lists.
@@ -128,7 +135,7 @@ class Atomx(object):
                   and ``not in`` a list of numbers.
 
         :param datetime.datetime from_: :class:`datetime.datetime` where the report
-            should start (inclusive)
+            should start (inclusive). (defaults to last week)
         :param datetime.datetime to: :class:`datetime.datetime` where the report
             should end (exclusive). (defaults to `datetime.now()` if undefined)
         :param str timezone:  Timezone used for all times. (defaults to `UTC`)
@@ -139,18 +146,47 @@ class Atomx(object):
             to speed up the query.
         :return: A :class:`atomx.models.Report` model
         """
-        report_json = locals().copy()
-        del report_json['self']
+        report_json = {'timezone': timezone, 'fast': fast}
+
+        if groups:
+            report_json['groups'] = groups
+        if sums:
+            report_json['sums'] = sums
+        elif not groups:
+            raise MissingArgumentError('Either `groups` or `sums` have to be set.')
+
+        if scope is None:
+            for i in report_json.get('groups', []) + report_json.get('sums', []):
+                if i.split('_')[0] in ['advertiser', 'campaign', 'creative', 'pixel']:
+                    scope = 'advertiser'
+                    break
+            else:
+                for i in report_json.get('groups', []) + report_json.get('sums', []):
+                    if i.split('_')[0] in ['site', 'placement', 'user']:
+                        scope = 'publisher'
+                        break
+                else:
+                    raise MissingArgumentError('Unable to detect scope automatically. '
+                                               'Please set `scope` parameter.')
+        report_json['scope'] = scope
+
+        if where:
+            report_json['where'] = where
+
+        if from_ is None:
+            from_ = datetime.now() - timedelta(days=7)
+        if isinstance(from_, datetime):
+            report_json['from'] = from_.strftime("%Y-%m-%d %H:00:00")
+        else:
+            report_json['from'] = from_
 
         if to is None:
-            report_json['to'] = datetime.now()
-        if isinstance(report_json['to'], datetime):
-            report_json['to'] = report_json['to'].strftime("%Y-%m-%d %H:00:00")
-        if isinstance(report_json.get('from_'), datetime):
-            report_json['from'] = report_json['from_'].strftime("%Y-%m-%d %H:00:00")
+            to = datetime.now()
+        if isinstance(to, datetime):
+            report_json['to'] = to.strftime("%Y-%m-%d %H:00:00")
         else:
-            report_json['from'] = report_json['from_']
-        del report_json['from_']
+            report_json['to'] = to
+
         r = self.session.post(self.api_endpoint + 'report', json=report_json)
         if not r.ok:
             raise APIError(r.json()['error'])

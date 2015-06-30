@@ -12,6 +12,10 @@ class APIError(Exception):
     """Raised when the atomx api returns an error that is not caught otherwise."""
     pass
 
+class MissingArgumentError(Exception):
+    """Raised when argument is missing."""
+    pass
+
 class ModelNotFoundError(Exception):
     """Raised when trying to (re-)load a model that is not in the api."""
     pass
