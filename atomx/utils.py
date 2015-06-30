@@ -46,3 +46,23 @@ def get_attribute_model_name(attribute):
     :return: name of the model or False
     """
     return get_model_name(re.sub('(_filter|_include|_exclude)$', '', attribute))
+
+
+def model_name_to_rest(name):
+    """Gets a name of a :mod:`atomx.models` and transforms it in the
+    resource name for the atomx api.
+    E.g.::
+
+        >>> assert model_name_to_rest('ConversionPixels') ==  'conversion-pixels'
+        >>> assert model_name_to_rest('OperatingSystem') == 'operating-system'
+        >>> assert model_name_to_rest('Advertiser') == 'Advertiser'
+
+    :param str name: Name of the model to convert
+    :return: :class:`str` with the transformed name.
+    """
+    r = name[0]
+    for i in range(1, len(name)):
+        if name[i].isupper():
+            r += '-'
+        r += name[i]
+    return r.lower()

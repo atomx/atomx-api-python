@@ -72,6 +72,11 @@ class AtomxModel(object):
         return '{}({})'.format(self.__class__.__name__, pprint.pformat(self.json))
 
     @property
+    def _resource_name(self):
+        from atomx.utils import model_name_to_rest
+        return model_name_to_rest(self.__class__.__name__)
+
+    @property
     def _dirty_json(self):
         return {k: self._attributes[k] for k in self._dirty}
 
@@ -91,7 +96,7 @@ class AtomxModel(object):
         session = session or self.session
         if not session:
             raise NoSessionError
-        res = session.post(self.__class__.__name__, json=self.json)
+        res = session.post(self._resource_name, json=self.json)
         self.__init__(session=session, **res)
         return self
 
@@ -110,7 +115,7 @@ class AtomxModel(object):
         session = session or self.session
         if not session:
             raise NoSessionError
-        res = session.put(self.__class__.__name__, self.id, json=self._dirty_json)
+        res = session.put(self._resource_name, self.id, json=self._dirty_json)
         self.__init__(session=session, **res)
         return self
 
@@ -138,7 +143,7 @@ class AtomxModel(object):
         if not hasattr(self, 'id'):
             raise ModelNotFoundError("Can't reload without 'id' parameter. "
                                      "Forgot to save() first?")
-        res = session.get(self.__class__.__name__ + '/' + str(self.id))
+        res = session.get(self._resource_name + '/' + str(self.id))
         self.__init__(session=session, **res.json)
         return self
 
