@@ -4,24 +4,30 @@ from atomx import models
 
 def get_model_name(name):
     """Checks that :param:`name` is a valid model.
-    Converts plural `name` to capitalized singular form and '-' or '_' separation to camelCase.
+    Converts plural `name` to capitalized singular form,
+    rstrips '_list' (e.g. `advertisers_list`)
+    and '-' or '_' separation to camelCase.
     Returns the name of the model if found, False otherwise.
     E.g.
 
-    >>> check_model_name("countries")
+    >>> check_model_name('countries')
     "Country"
-    >>> check_model_name("ADVERTISERS")
+    >>> check_model_name('ADVERTISERS')
     "Advertiser"
-    >>> check_model_name("conversion-pixels")
+    >>> check_model_name('conversion-pixels')
     "ConversionPixel"
-    >>> check_model_name("operating_system")
+    >>> check_model_name('operating_system')
     "OperatingSystem"
-    >>> check_model_name("InvalidModel")
+    >>> check_model_name('InvalidModel')
     False
+    >>> check_model_name('advertisers_list')
+    "Advertiser"
 
     :param str name: model name to convert
     :return: name of the model or False
     """
+    if name.endswith('_list'):
+        name = name[:-5]
     if '-' in name:
         model_name = ''.join(m.capitalize() for m in name.split('-'))
     elif '_' in name:
@@ -55,7 +61,7 @@ def model_name_to_rest(name):
 
         >>> assert model_name_to_rest('ConversionPixels') ==  'conversion-pixels'
         >>> assert model_name_to_rest('OperatingSystem') == 'operating-system'
-        >>> assert model_name_to_rest('Advertiser') == 'Advertiser'
+        >>> assert model_name_to_rest('Advertiser') == 'advertiser'
 
     :param str name: Name of the model to convert
     :return: :class:`str` with the transformed name.

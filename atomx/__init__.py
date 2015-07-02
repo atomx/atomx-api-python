@@ -7,7 +7,10 @@ from datetime import (
 import requests
 from atomx.version import API_VERSION, VERSION
 from atomx import models
-from atomx.utils import get_model_name
+from atomx.utils import (
+    get_model_name,
+    model_name_to_rest,
+)
 from atomx.exceptions import (
     APIError,
     ModelNotFoundError,
@@ -213,7 +216,7 @@ class Atomx(object):
             raise APIError(r.json()['error'])
         return r.json()['report']
 
-    def report_get(self, report):
+    def report_get(self, report, limit=None, sort=None):
         """Get the content (csv) of a :class:`.models.Report`
 
         Typically used by calling :meth:`.models.Report.content` or
@@ -229,7 +232,13 @@ class Atomx(object):
         else:
             report_id = report
 
-        r = self.session.get(self.api_endpoint + 'report/' + report_id)
+        params = {}
+        if limit:
+            params['limit'] = int(limit)
+        if sort:
+            params['sort'] = sort
+
+        r = self.session.get(self.api_endpoint + 'report/' + report_id, params=params)
         if not r.ok:
             raise APIError(r.json()['error'])
         return r.content.decode()
@@ -286,6 +295,9 @@ class Atomx(object):
         model = get_model_name(model_name)
         if model:
             if isinstance(res, list):
+                if model_name.endswith('_list'):
+                    # special case for _list requests
+                    res = [{'id': id, 'name': name} for id, name in res]
                 return [getattr(models, model)(self, **m) for m in res]
             return getattr(models, model)(self, **res)
         return res
