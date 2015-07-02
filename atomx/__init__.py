@@ -37,7 +37,7 @@ class Atomx(object):
     :return: :class:`.Atomx` session to interact with the api
     """
     def __init__(self, email, password, api_endpoint=API_ENDPOINT):
-        self.auth_tk = None
+        self.auth_tkt = None
         self.email = email
         self.password = password
         self.api_endpoint = api_endpoint.rstrip('/') + '/'
@@ -68,11 +68,11 @@ class Atomx(object):
             if r.status_code == 401:
                 raise InvalidCredentials
             raise APIError(r.json()['error'])
-        self.auth_tk = r.json()['auth_tkt']
+        self.auth_tkt = r.json()['auth_tkt']
 
     def logout(self):
         """Removes authentication token from session."""
-        self.auth_tk = None
+        self.auth_tkt = None
         self.session.get(self.api_endpoint + 'logout')
 
     def search(self, query):
