@@ -71,6 +71,9 @@ class AtomxModel(object):
     def __repr__(self):
         return '{}({})'.format(self.__class__.__name__, pprint.pformat(self.json))
 
+    def __eq__(self, other):
+        return self.id == getattr(other, 'id', 'INVALID')
+
     @property
     def _resource_name(self):
         from atomx.utils import model_name_to_rest

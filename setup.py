@@ -47,6 +47,7 @@ setup(
     keywords='atomx rest api',
 
     setup_requires=['setuptools_git'],
+    tests_require=['pytest'],
     install_requires=requires,
-    extra_require=extra_require,
+    extras_require=extra_require,
 )

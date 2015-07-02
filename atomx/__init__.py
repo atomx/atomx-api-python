@@ -37,6 +37,7 @@ class Atomx(object):
     :return: :class:`.Atomx` session to interact with the api
     """
     def __init__(self, email, password, api_endpoint=API_ENDPOINT):
+        self.auth_tk = None
         self.email = email
         self.password = password
         self.api_endpoint = api_endpoint.rstrip('/') + '/'
