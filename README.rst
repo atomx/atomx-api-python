@@ -2,7 +2,11 @@ Python Atomx Api
 ================
 
 Interface for the atomx rest api.
-`atomx wiki <http://wiki.atomx.com/doku.php?id=api>`_
+
+For more information read the full
+`documentation online <http://atomx-api-python.readthedocs.org/en/latest/index.html>`_,
+report bugs in `github <https://github.com/atomx/atomx-api-python>`_
+or see the `atomx wiki <http://wiki.atomx.com/doku.php?id=api>`_
 
 
 Example Usage

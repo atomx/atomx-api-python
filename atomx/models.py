@@ -213,7 +213,7 @@ class Report(object):
 
         :param int limit: limit the amount of lines to return (defaults to no limit)
         :param str sort: defines the sort order of the report content.
-            ``sort`` can be `column_name`[.asc|.desc][,column_name[.asc|.desc]]...
+            ``sort`` can be `column_name`[.asc|.desc][,column_name[.asc|.desc]]`...
         :return: report content
         """
         if not self.is_ready:
