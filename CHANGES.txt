@@ -1,3 +1,9 @@
+1.1 (unreleased)
+----------------
+
+- fix: setup.py not working under some environments (`open` used wrong codec)
+
+
 1.0
 ---
 
