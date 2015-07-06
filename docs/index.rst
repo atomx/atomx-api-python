@@ -1,8 +1,8 @@
 .. _index:
 
 
-Documentation for the python interface to the atomx api
-=======================================================
+Python interface to atomx
+=========================
 
 Contents:
 
