@@ -16,7 +16,7 @@ from atomx.exceptions import (
 __all__ = ['Advertiser', 'Bidder', 'Browser', 'Campaign', 'Category', 'ConnectionType',
            'ConversionPixel', 'Country', 'Creative', 'Datacenter', 'DeviceType',
            'Domain', 'Fallback', 'Isp', 'Languages', 'Network', 'OperatingSystem',
-           'Placement', 'Profile', 'Publisher', 'Reason', 'Segment', 'Seller',
+           'Placement', 'Profile', 'Publisher', 'Reason', 'Segment', 'SellerProfile',
            'Site', 'Size', 'User']
 
 

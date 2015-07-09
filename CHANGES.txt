@@ -2,6 +2,7 @@
 ----------------
 
 - fix: setup.py not working under some environments (`open` used wrong codec)
+- add SellerProfile model
 
 
 1.0
