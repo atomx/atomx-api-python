@@ -216,7 +216,7 @@ class Atomx(object):
             raise APIError(r.json()['error'])
         return r.json()['report']
 
-    def report_get(self, report, limit=None, sort=None):
+    def report_get(self, report, sort=None, limit=None, offset=None):
         """Get the content (csv) of a :class:`.models.Report`
 
         Typically used by calling :meth:`.models.Report.content` or
@@ -235,6 +235,8 @@ class Atomx(object):
         params = {}
         if limit:
             params['limit'] = int(limit)
+        if offset:
+            params['offset'] = int(offset)
         if sort:
             params['sort'] = sort
 

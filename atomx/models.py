@@ -207,18 +207,19 @@ class Report(object):
         self.__init__(session=self.session, **status)
         return self
 
-    def get(self, limit=None, sort=None):
+    def get(self, sort=None, limit=None, offset=None):
         """Get the first ``limit`` lines of the report ``content``
         and in the specified ``sort`` order.
 
-        :param int limit: limit the amount of lines to return (defaults to no limit)
         :param str sort: defines the sort order of the report content.
             ``sort`` can be `column_name`[.asc|.desc][,column_name[.asc|.desc]]`...
+        :param int limit: limit the amount of lines to return (defaults to no limit)
+        :param int offset: Skip the first `offset` number of lines (defaults to none)
         :return: report content
         """
         if not self.is_ready:
             raise ReportNotReadyError()
-        return self.session.report_get(self, limit=limit, sort=sort)
+        return self.session.report_get(self, sort=sort, limit=limit, offset=offset)
 
     @property
     def content(self):

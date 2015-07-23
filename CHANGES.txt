@@ -3,6 +3,7 @@
 
 - fix: setup.py not working under some environments (`open` used wrong codec)
 - add SellerProfile model
+- add `offset` parameter to report.get
 
 
 1.0
