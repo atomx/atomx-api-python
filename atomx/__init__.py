@@ -161,7 +161,7 @@ class Atomx(object):
 
         if scope is None:
             for i in report_json.get('groups', []) + report_json.get('sums', []):
-                if i.split('_')[0] in ['advertiser', 'campaign', 'creative', 'pixel']:
+                if i.split('_')[0] in ['advertiser', 'campaign', 'creative', 'conversion_pixel']:
                     scope = 'advertiser'
                     break
             else:
