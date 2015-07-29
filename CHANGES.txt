@@ -1,3 +1,9 @@
+1.2 (unreleased)
+----------------
+
+- you can now remove model attributes with `del`
+
+
 1.1
 ---
 

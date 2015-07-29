@@ -64,6 +64,13 @@ class AtomxModel(object):
             self._attributes[key] = value
             self._dirty.add(key)
 
+    def __delattr__(self, item):
+        if item in self._dirty:
+            self._dirty.remove[item]
+        else:
+            self._attributes[item] = None
+            self._dirty.add(item)
+
     def __dir__(self):
         """Manually add dynamic attributes for autocomplete"""
         return dir(type(self)) + list(self.__dict__.keys()) + list(self._attributes.keys())
