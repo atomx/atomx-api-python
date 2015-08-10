@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import csv
 import pprint
 try:  # py3
     from io import StringIO
@@ -182,6 +183,9 @@ class Report(object):
         if is_ready:
             self._is_ready = is_ready
 
+    def __repr__(self):
+        return "Report(id='{}', is_ready={}, query={})".format(self.id, self.is_ready, self.query)
+
     @property
     def is_ready(self):
         """Returns ``True`` if the :class:`.Report` is ready, ``False`` otherwise."""
@@ -230,10 +234,17 @@ class Report(object):
 
     @property
     def content(self):
-        """Returns the content (csv) of the `report`."""
+        """Returns the raw content (csv) of the `report`."""
         if not self.is_ready:
             raise ReportNotReadyError()
         return self.session.report_get(self)
+
+    @property
+    def csv(self):
+        """Returns the report content (csv) as a list of lists."""
+        if not self.is_ready:
+            raise ReportNotReadyError()
+        return list(csv.reader(self.content.splitlines(), delimiter='\t'))
 
     @property
     def pandas(self):
