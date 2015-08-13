@@ -1,5 +1,5 @@
-1.2 (unreleased)
-----------------
+1.2
+---
 
 - you can now remove model attributes with `del`
 - add :meth:`atomx.models.Report.csv` property that returns the report content as a list
