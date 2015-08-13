@@ -3,6 +3,9 @@
 
 - you can now remove model attributes with `del`
 - add :meth:`atomx.models.Report.csv` property that returns the report content as a list
+- save logged in user as `user` property to :class:`atomx.Atomx`
+- add network reports
+- try to determine report scope from user access rights if no scope was specified
 
 
 1.1

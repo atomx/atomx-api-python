@@ -41,6 +41,7 @@ class Atomx(object):
     """
     def __init__(self, email, password, api_endpoint=API_ENDPOINT):
         self.auth_tkt = None
+        self.user = None
         self.email = email
         self.password = password
         self.api_endpoint = api_endpoint.rstrip('/') + '/'
@@ -72,10 +73,12 @@ class Atomx(object):
                 raise InvalidCredentials
             raise APIError(r.json()['error'])
         self.auth_tkt = r.json()['auth_tkt']
+        self.user = models.User(**r.json()['user'])
 
     def logout(self):
         """Removes authentication token from session."""
         self.auth_tkt = None
+        self.user = None
         self.session.get(self.api_endpoint + 'logout')
 
     def search(self, query):
@@ -117,22 +120,22 @@ class Atomx(object):
                                     for v in search_result[m]]
         return search_result
 
-    def report(self, scope=None, groups=None, sums=None, where=None,
+    def report(self, scope=None, groups=None, metrics=None, where=None,
                from_=None, to=None, timezone='UTC', fast=True):
         """Create a report.
 
         See the `reporting atomx wiki <http://wiki.atomx.com/doku.php?id=reporting>`_
-        for details about parameters and available groups, sums.
+        for details about parameters and available groups, metrics.
 
-        :param str scope: either 'advertiser' or 'publisher' to select the type of report.
-            If undefined but the groups column have an unambiguous attribute that's
-            unique to a certain scope, it's set automatically.
+        :param str scope: either 'advertiser', 'publisher' or 'network' to select the type
+            of report. If undefined it tries to determine the `scope` automatically based
+            on the `groups` and `metrics` parameters and the access rights of the api user.
         :param list groups: columns to group by.
-        :param list sums: columns to sum on.
+        :param list metrics: columns to sum on.
         :param list where: is a list of expression lists.
             An expression list is in the form of ``[column, op, value]``:
 
-                - ``column`` can be any of the ``groups`` or ``sums`` parameter columns.
+                - ``column`` can be any of the ``groups`` or ``metrics`` parameter columns.
                 - ``op`` can be any of ``==``, ``!=``, ``<=``, ``>=``,
                   ``<``, ``>``, ``in`` or ``not in`` as a string.
                 - ``value`` is either a number or in case of ``in``
@@ -154,22 +157,26 @@ class Atomx(object):
 
         if groups:
             report_json['groups'] = groups
-        if sums:
-            report_json['sums'] = sums
+        if metrics:
+            report_json['metrics'] = metrics
         elif not groups:
-            raise MissingArgumentError('Either `groups` or `sums` have to be set.')
+            raise MissingArgumentError('Either `groups` or `metrics` have to be set.')
 
         if scope is None:
-            for i in report_json.get('groups', []) + report_json.get('sums', []):
-                if i.split('_')[0] in ['advertiser', 'campaign', 'creative', 'conversion_pixel']:
-                    scope = 'advertiser'
+            for i in report_json.get('groups', []) + report_json.get('metrics', []):
+                if '_network' in i:
+                    scope = 'network'
                     break
             else:
-                for i in report_json.get('groups', []) + report_json.get('sums', []):
-                    if i.split('_')[0] in ['site', 'placement', 'user']:
-                        scope = 'publisher'
-                        break
-                else:
+                user = self.user
+                if len(user.networks) > 0:
+                    pass  # user has network access so could be any report (leave scope as None)
+                elif len(user.publishers) > 0 and len(user.advertisers) == 0:
+                    scope = 'publishers'
+                elif len(user.advertisers) > 0 and len(user.publishers) == 0:
+                    scope = 'advertisers'
+
+                if scope is None:
                     raise MissingArgumentError('Unable to detect scope automatically. '
                                                'Please set `scope` parameter.')
         report_json['scope'] = scope
