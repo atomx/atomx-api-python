@@ -67,7 +67,7 @@ class AtomxModel(object):
 
     def __delattr__(self, item):
         if item in self._dirty:
-            self._dirty.remove[item]
+            self._dirty.remove(item)
         else:
             self._attributes[item] = None
             self._dirty.add(item)
