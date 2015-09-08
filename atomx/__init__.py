@@ -346,11 +346,17 @@ class Atomx(object):
             raise APIError(r_json['error'])
         return r_json[r_json['resource']]
 
-    def delete(self, resource, id, json, **kwargs):
-        """Delete is currently not supported by the api.
-        Set the resources `state` to `INACTIVE` to deactivate it.
+    def delete(self, resource, **kwargs):
+        """Send HTTP DELETE to ``resource``.
+
+        :param resource: Name of the resource to `DELETE`.
+        :return: message or resource returned by the api.
         """
-        pass
+        r = self.session.delete(self.api_endpoint + resource.strip('/'), params=kwargs)
+        r_json = r.json()
+        if not r.ok:
+            raise APIError(r_json['error'])
+        return r_json[r_json['resource']]
 
     def save(self, model):
         """Alias for :meth:`.models.AtomxModel.save` with `session` argument."""
