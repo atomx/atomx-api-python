@@ -121,7 +121,7 @@ class Atomx(object):
         return search_result
 
     def report(self, scope=None, groups=None, metrics=None, where=None,
-               from_=None, to=None, timezone='UTC', fast=True):
+               from_=None, to=None, timezone='UTC', emails=None, fast=True):
         """Create a report.
 
         See the `reporting atomx wiki <http://wiki.atomx.com/doku.php?id=reporting>`_
@@ -147,6 +147,9 @@ class Atomx(object):
             should end (exclusive). (defaults to `datetime.now()` if undefined)
         :param str timezone:  Timezone used for all times. (defaults to `UTC`)
             For a supported list see http://wiki.atomx.com/doku.php?id=timezones
+        :param emails: One or multiple email addresses that should get
+            notified once the report is finished and ready to download.
+        :type emails: str or list
         :param bool fast: if `False` the report will always be run against the low level data.
             This is useful for billing reports for example.
             The default is `True` which means it will always try to use aggregate data
@@ -197,6 +200,11 @@ class Atomx(object):
             report_json['to'] = to.strftime("%Y-%m-%d %H:00:00")
         else:
             report_json['to'] = to
+
+        if emails:
+            if not isinstance(emails, list):
+                emails = [emails]
+            report_json['emails'] = emails
 
         r = self.session.post(self.api_endpoint + 'report', json=report_json)
         if not r.ok:
