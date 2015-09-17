@@ -47,7 +47,9 @@ Example Usage
 
 
     # you can also get attributes
-    profiles = atomx.get('advertiser/88/profiles')
+    profiles = atomx.get('advertiser', 88, 'profiles')
+    # equivalent is to pass the complete resource path as string instead of arguments
+    profiles = atomx.get('advertiser/88/profiles')  # same as above
     # profiles is now a list of `atomx.models.Profile` that you can
     # read, update, etc again.
     profiles[0].click_frequency_cap_per = 86400

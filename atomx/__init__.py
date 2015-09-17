@@ -252,7 +252,7 @@ class Atomx(object):
             raise APIError(r.json()['error'])
         return r.content.decode()
 
-    def get(self, resource, **kwargs):
+    def get(self, resource, *args, **kwargs):
         """Returns a list of models from :mod:`.models` if you query for
         multiple models or a single instance of a model from :mod:`.models`
         if you query for a specific `id`
@@ -271,6 +271,8 @@ class Atomx(object):
             Get publisher with id 23::
 
                 >>> publisher = atomx.get('publisher/23')
+                >>>> # or get the same publisher using the id as parameter
+                >>> publisher = atomx.get('publisher', 23)
                 >>> assert publisher.id == 23
                 >>> assert isinstance(publisher, atomx.models.Publisher)
 
@@ -280,6 +282,16 @@ class Atomx(object):
                 >>> assert isinstance(profiles, list)
                 >>> assert isinstance(profiles[0], atomx.models.Profile)
                 >>> assert profiles[0].advertiser.id == 42
+
+        :param args: All non-keyword arguments will get used to compute the ``resource``.
+            This makes it easier if you want to work with a variable resource path.
+
+            .. code-block:: python
+
+                advertiser_id = 42
+                attribute = 'profiles'
+                profiles = atomx.get('advertiser', advertiser_id, attribute)
+                # is equivalent to atomx.get('advertiser/42/profiles')
 
         :param kwargs: Any argument is passed as URL parameter to the respective api endpoint.
             See `API URL Parameters <http://wiki.atomx.com/doku.php?id=api#url_parameters>`_
@@ -294,7 +306,10 @@ class Atomx(object):
 
         :return: a class from :mod:`.models` or a list of models depending on param `resource`
         """
-        r = self.session.get(self.api_endpoint + resource.strip('/'), params=kwargs)
+        resource = resource.strip('/')
+        for a in args:
+            resource += '/' + str(a)
+        r = self.session.get(self.api_endpoint + resource, params=kwargs)
         if not r.ok:
             raise APIError(r.json()['error'])
 
@@ -346,13 +361,19 @@ class Atomx(object):
             raise APIError(r_json['error'])
         return r_json[r_json['resource']]
 
-    def delete(self, resource, **kwargs):
+    def delete(self, resource, *args, **kwargs):
         """Send HTTP DELETE to ``resource``.
 
         :param resource: Name of the resource to `DELETE`.
+        :param args: All non-keyword arguments will be used to compute the final ``resource``.
+        :param kwargs: Optional keyword arguments will be passed as query string to the
+            delete request.
         :return: message or resource returned by the api.
         """
-        r = self.session.delete(self.api_endpoint + resource.strip('/'), params=kwargs)
+        resource = resource.strip('/')
+        for a in args:
+            resource += '/' + str(a)
+        r = self.session.delete(self.api_endpoint + resource, params=kwargs)
         r_json = r.json()
         if not r.ok:
             raise APIError(r_json['error'])

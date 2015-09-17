@@ -154,7 +154,7 @@ class AtomxModel(object):
         if not hasattr(self, 'id'):
             raise ModelNotFoundError("Can't reload without 'id' parameter. "
                                      "Forgot to save() first?")
-        res = session.get(self._resource_name + '/' + str(self.id))
+        res = session.get(self._resource_name, self.id)
         self.__init__(session=session, **res.json)
         return self
 

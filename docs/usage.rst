@@ -56,6 +56,20 @@ Or query all profiles of advertiser 42 ordered by last updated:
     profiles = atomx.get('advertiser/42/profiles', order_by='updated_at.desc')
 
 
+All non-keyword arguments that you pass :meth:`atomx.Atomx.get` will get used
+to compute the ``resource``. This makes it easier if you have the ``id``
+(and/or attribute) stored in a variable.
+
+E.g.
+
+.. code-block:: python
+
+    advertiser_id = 42
+    attribute = 'profiles'
+    profiles = atomx.get('advertiser', advertiser_id, attribute)
+    # is equivalent to atomx.get('advertiser/42/profiles')
+
+
 Or get all domains where the hostname contains `atom`:
 
 .. code-block:: python

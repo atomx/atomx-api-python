@@ -2,7 +2,8 @@
 ----------------
 
 - add :meth:`atomx.Atomx.delete` to send a ``HTTP DELETE`` request to the api
-
+- :meth:`atomx.Atomx.get` and :meth:`atomx.Atomx.delete` accept non-keyword arguments
+    that are used to compute the final resource path.
 
 1.2
 ---
