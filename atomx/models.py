@@ -2,6 +2,8 @@
 
 import csv
 import pprint
+from decimal import Decimal
+from datetime import datetime, date
 try:  # py3
     from io import StringIO
 except ImportError:  # py2
@@ -33,6 +35,18 @@ class AtomxModel(object):
         :param attributes: attributes
         :return: model.{model}
         """
+        for k, v in attributes.items():
+            if k.endswith('_at'):
+                try:
+                    attributes[k] = datetime.strptime(v, '%Y-%m-%dT%H:%M:%S')
+                except (ValueError, TypeError):
+                    pass
+            elif k == 'date':
+                try:
+                    attributes[k] = datetime.strptime(v, '%Y-%m-%d')
+                except (ValueError, TypeError):
+                    pass
+
         super(AtomxModel, self).__setattr__('session', session)
         super(AtomxModel, self).__setattr__('_attributes', attributes)
         super(AtomxModel, self).__setattr__('_dirty', set())  # list of changed attributes
@@ -89,7 +103,19 @@ class AtomxModel(object):
 
     @property
     def _dirty_json(self):
-        return {k: self._attributes[k] for k in self._dirty}
+        dirty = {}
+        for attr in self._dirty:
+            val = self._attributes[attr]
+            if isinstance(val, datetime) or isinstance(val, date):
+                dirty[attr] = val.isoformat()
+            elif isinstance(val, Decimal):
+                dirty[attr] = float(val)
+            elif isinstance(val, set):
+                dirty[attr] = list(val)
+            else:
+                dirty[attr] = val
+
+        return dirty
 
     @property
     def json(self):

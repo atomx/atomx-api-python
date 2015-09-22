@@ -3,8 +3,11 @@
 
 - Add :meth:`atomx.Atomx.delete` to send a ``HTTP DELETE`` request to the api
 - :meth:`atomx.Atomx.get` and :meth:`atomx.Atomx.delete` accept non-keyword arguments
-    that are used to compute the final resource path
+  that are used to compute the final resource path
 - Add `emails` parameter to :meth:`atomx.Atomx.report`
+- Model attributes that are dates get automatically converted to a python :mod:`datetime`
+- When saving a model, dates, sets and decimals get automatically converted
+  to there json counterpart
 
 
 1.2
