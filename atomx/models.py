@@ -212,6 +212,9 @@ class Report(object):
     def __repr__(self):
         return "Report(id='{}', is_ready={}, query={})".format(self.id, self.is_ready, self.query)
 
+    def __eq__(self, other):
+        return self.id == getattr(other, 'id', 'INVALID')
+
     @property
     def is_ready(self):
         """Returns ``True`` if the :class:`.Report` is ready, ``False`` otherwise."""
