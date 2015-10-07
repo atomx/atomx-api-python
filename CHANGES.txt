@@ -1,5 +1,5 @@
-1.3 (unreleased)
-----------------
+1.3
+---
 
 - Add :meth:`atomx.Atomx.delete` to send a ``HTTP DELETE`` request to the api
 - :meth:`atomx.Atomx.get` and :meth:`atomx.Atomx.delete` accept non-keyword arguments
@@ -8,7 +8,8 @@
 - Model attributes that are dates get automatically converted to a python :mod:`datetime`
 - When saving a model, dates, sets and decimals get automatically converted
   to there json counterpart
-
+- Add `save_response` parameter to :class:`atomx.Atomx` to save the response meta data
+  of the last api call.
 
 1.2
 ---

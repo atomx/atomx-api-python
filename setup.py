@@ -14,7 +14,7 @@ with open(path.join(here, 'atomx', 'version.py')) as f:
 requires = [
     'requests',
 ]
-extra_require={
+extra_require = {
     'report': ['ipython[notebook]', 'pandas', 'matplotlib'],
     'test': ['pytest'],
     'docs': ['sphinx'],

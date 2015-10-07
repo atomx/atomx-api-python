@@ -37,14 +37,19 @@ class Atomx(object):
     :param str password:  password of your atomx user
     :param str api_endpoint: url for connections to the api
         (defaults to `https://api.atomx.com/{API_VERSION}`)
+    :param bool save_response: If `True` save the last api response meta info
+        (without the resource payload) in :attr:`.Atomx.last_response`. (default: `True`)
     :return: :class:`.Atomx` session to interact with the api
     """
-    def __init__(self, email, password, api_endpoint=API_ENDPOINT):
+    def __init__(self, email, password, api_endpoint=API_ENDPOINT, save_response=True):
         self.auth_tkt = None
         self.user = None
         self.email = email
         self.password = password
         self.api_endpoint = api_endpoint.rstrip('/') + '/'
+        self.save_response = save_response
+        #: Contains the response of the last api call, if `save_response` was set `True`
+        self.last_response = None
         self.session = requests.Session()
         self.login()
 
@@ -109,9 +114,15 @@ class Atomx(object):
         :return: dict with list of :mod:`.models` as values
         """
         r = self.session.get(self.api_endpoint + 'search', params={'q': query})
+        r_json = r.json()
         if not r.ok:
-            raise APIError(r.json()['error'])
-        search_result = r.json()['search']
+            raise APIError(r_json['error'])
+        search_result = r_json['search']
+
+        if self.save_response:
+            del r_json['search']
+            self.last_response = r_json
+
         # convert publisher, creative dicts etc from search result to Atomx.model
         for m in search_result.keys():
             model_name = get_model_name(m)
@@ -207,9 +218,16 @@ class Atomx(object):
             report_json['emails'] = emails
 
         r = self.session.post(self.api_endpoint + 'report', json=report_json)
+        r_json = r.json()
         if not r.ok:
-            raise APIError(r.json()['error'])
-        return models.Report(self, query=r.json()['query'], **r.json()['report'])
+            raise APIError(r_json['error'])
+        report = r_json['report']
+
+        if self.save_response:
+            del r_json['report']
+            self.last_response = r_json
+
+        return models.Report(self, query=r.json()['query'], **report)
 
     def report_status(self, report):
         """Get the status for a `report`.
@@ -229,6 +247,10 @@ class Atomx(object):
         r = self.session.get(self.api_endpoint + 'report/' + report_id, params={'status': True})
         if not r.ok:
             raise APIError(r.json()['error'])
+
+        if self.save_response:
+            self.last_response = r.json()
+
         return r.json()['report']
 
     def report_get(self, report, sort=None, limit=None, offset=None):
@@ -324,6 +346,9 @@ class Atomx(object):
         r_json = r.json()
         model_name = r_json['resource']
         res = r_json[model_name]
+        if self.save_response:
+            del r_json[model_name]
+            self.last_response = r_json
         model = get_model_name(model_name)
         if model:
             if isinstance(res, list):
@@ -349,7 +374,12 @@ class Atomx(object):
         r_json = r.json()
         if not r.ok:
             raise APIError(r_json['error'])
-        return r_json[r_json['resource']]
+        model_name = r_json['resource']
+        res = r_json[model_name]
+        if self.save_response:
+            del r_json[model_name]
+            self.last_response = r_json
+        return res
 
     def put(self, resource, id, json, **kwargs):
         """Send HTTP PUT to ``resource``/``id`` with ``json`` content.
@@ -367,7 +397,12 @@ class Atomx(object):
         r_json = r.json()
         if not r.ok:
             raise APIError(r_json['error'])
-        return r_json[r_json['resource']]
+        model_name = r_json['resource']
+        res = r_json[model_name]
+        if self.save_response:
+            del r_json[model_name]
+            self.last_response = r_json
+        return res
 
     def delete(self, resource, *args, **kwargs):
         """Send HTTP DELETE to ``resource``.
@@ -385,7 +420,12 @@ class Atomx(object):
         r_json = r.json()
         if not r.ok:
             raise APIError(r_json['error'])
-        return r_json[r_json['resource']]
+        model_name = r_json['resource']
+        res = r_json[model_name]
+        if self.save_response:
+            del r_json[model_name]
+            self.last_response = r_json
+        return res
 
     def save(self, model):
         """Alias for :meth:`.models.AtomxModel.save` with `session` argument."""
