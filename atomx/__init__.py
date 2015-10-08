@@ -379,6 +379,9 @@ class Atomx(object):
         if self.save_response:
             del r_json[model_name]
             self.last_response = r_json
+        model = get_model_name(model_name)
+        if model and isinstance(res, list):
+            return [getattr(models, model)(self, **m) for m in res]
         return res
 
     def put(self, resource, id, json, **kwargs):

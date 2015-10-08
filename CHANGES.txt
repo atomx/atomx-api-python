@@ -1,3 +1,10 @@
+1.4  (unreleased)
+-----------------
+
+- if :meth:`atomx.Atomx.post` returns a list, auto-convert list of objects
+  to a list of :mod:`atomx.models` models. (Useful for `POST` to the `/domains` endpoint)
+
+
 1.3
 ---
 
