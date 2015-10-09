@@ -1,7 +1,8 @@
 1.4  (unreleased)
 -----------------
 
-- if :meth:`atomx.Atomx.post` returns a list, auto-convert list of objects
+- Change default API version to `v2`
+- If :meth:`atomx.Atomx.post` returns a list, auto-convert list of objects
   to a list of :mod:`atomx.models` models. (Useful for `POST` to the `/domains` endpoint)
 
 
@@ -16,7 +17,7 @@
 - When saving a model, dates, sets and decimals get automatically converted
   to there json counterpart
 - Add `save_response` parameter to :class:`atomx.Atomx` to save the response meta data
-  of the last api call.
+  of the last api call
 
 1.2
 ---

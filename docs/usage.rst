@@ -21,7 +21,7 @@ optionally you can specify a different api endpoint for testing:
 
     # create atomx session with sandbox endpoint
     atomx = Atomx('user@example.com', 'password',
-                  api_endpoint='https://sandbox.api.atomx.com/v1')
+                  api_endpoint='https://sandbox.api.atomx.com/v2')
 
 
 Fetching resources

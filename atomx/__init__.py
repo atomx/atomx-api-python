@@ -352,9 +352,6 @@ class Atomx(object):
         model = get_model_name(model_name)
         if model:
             if isinstance(res, list):
-                if model_name.endswith('_list'):
-                    # special case for _list requests
-                    res = [{'id': id, 'name': name} for id, name in res]
                 return [getattr(models, model)(self, **m) for m in res]
             return getattr(models, model)(self, **res)
         return res
