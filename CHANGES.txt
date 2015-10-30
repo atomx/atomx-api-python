@@ -1,9 +1,12 @@
-1.4  (unreleased)
------------------
+1.4
+---
 
 - Change default API version to `v2`
 - If :meth:`atomx.Atomx.post` returns a list, auto-convert list of objects
   to a list of :mod:`atomx.models` models. (Useful for `POST` to the `/domains` endpoint)
+- Add :class:`atomx.models.ScheduledReport`
+- :meth:`atomx.Atomx.report` accepts ``when`` and ``interval`` to create a
+  :class:`atomx.models.ScheduledReport`
 
 
 1.3

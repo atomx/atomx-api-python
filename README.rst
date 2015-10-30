@@ -6,7 +6,7 @@ Interface for the atomx rest api.
 For more information read the full
 `documentation online <http://atomx-api-python.readthedocs.org/en/latest/index.html>`_,
 report bugs in `github <https://github.com/atomx/atomx-api-python>`_
-or see the `atomx wiki <http://wiki.atomx.com/doku.php?id=api>`_
+or see the `atomx wiki <https://wiki.atomx.com/api>`_
 
 
 Example Usage

@@ -31,7 +31,7 @@ class Atomx(object):
     """Interface for the api on api.atomx.com.
 
     To learn more about the api visit the
-    `atomx wiki <http://wiki.atomx.com/doku.php?id=api>`_
+    `atomx wiki <https://wiki.atomx.com/api>`_
 
     :param str email: email address of your atomx user
     :param str password:  password of your atomx user
@@ -131,11 +131,11 @@ class Atomx(object):
                                     for v in search_result[m]]
         return search_result
 
-    def report(self, scope=None, groups=None, metrics=None, where=None,
-               from_=None, to=None, timezone='UTC', emails=None, fast=True):
+    def report(self, scope=None, groups=None, metrics=None, where=None, from_=None, to=None,
+               timezone='UTC', emails=None, fast=True, when=None, interval=None):
         """Create a report.
 
-        See the `reporting atomx wiki <http://wiki.atomx.com/doku.php?id=reporting>`_
+        See the `reporting atomx wiki <https://wiki.atomx.com/reporting>`_
         for details about parameters and available groups, metrics.
 
         :param str scope: either 'advertiser', 'publisher' or 'network' to select the type
@@ -157,7 +157,7 @@ class Atomx(object):
         :param datetime.datetime to: :class:`datetime.datetime` where the report
             should end (exclusive). (defaults to `datetime.now()` if undefined)
         :param str timezone:  Timezone used for all times. (defaults to `UTC`)
-            For a supported list see http://wiki.atomx.com/doku.php?id=timezones
+            For a supported list see https://wiki.atomx.com/timezones
         :param emails: One or multiple email addresses that should get
             notified once the report is finished and ready to download.
         :type emails: str or list
@@ -165,6 +165,8 @@ class Atomx(object):
             This is useful for billing reports for example.
             The default is `True` which means it will always try to use aggregate data
             to speed up the query.
+        :param str when: When should the scheduled report run. (daily, monthly, monday-sunday)
+        :param str interval: Time period included in the scheduled report ('N days' or 'N month')
         :return: A :class:`atomx.models.Report` model
         """
         report_json = {'timezone': timezone, 'fast': fast}
@@ -198,19 +200,26 @@ class Atomx(object):
         if where:
             report_json['where'] = where
 
-        if from_ is None:
-            from_ = datetime.now() - timedelta(days=7)
-        if isinstance(from_, datetime):
-            report_json['from'] = from_.strftime("%Y-%m-%d %H:00:00")
+        if when and interval:
+            is_scheduled_report = True
+            report_json['when'] = when
+            report_json['interval'] = interval
         else:
-            report_json['from'] = from_
+            is_scheduled_report = False
 
-        if to is None:
-            to = datetime.now()
-        if isinstance(to, datetime):
-            report_json['to'] = to.strftime("%Y-%m-%d %H:00:00")
-        else:
-            report_json['to'] = to
+            if from_ is None:
+                from_ = datetime.now() - timedelta(days=7)
+            if isinstance(from_, datetime):
+                report_json['from'] = from_.strftime("%Y-%m-%d %H:00:00")
+            else:
+                report_json['from'] = from_
+
+            if to is None:
+                to = datetime.now()
+            if isinstance(to, datetime):
+                report_json['to'] = to.strftime("%Y-%m-%d %H:00:00")
+            else:
+                report_json['to'] = to
 
         if emails:
             if not isinstance(emails, list):
@@ -226,6 +235,9 @@ class Atomx(object):
         if self.save_response:
             del r_json['report']
             self.last_response = r_json
+
+        if is_scheduled_report:
+            return models.ScheduledReport(self, query=r.json()['query'], **report)
 
         return models.Report(self, query=r.json()['query'], **report)
 
@@ -324,7 +336,7 @@ class Atomx(object):
                 # is equivalent to atomx.get('advertiser/42/profiles')
 
         :param kwargs: Any argument is passed as URL parameter to the respective api endpoint.
-            See `API URL Parameters <http://wiki.atomx.com/doku.php?id=api#url_parameters>`_
+            See `API URL Parameters <https://wiki.atomx.com/api#url_parameters>`_
             in the wiki.
 
             Example:
@@ -354,6 +366,11 @@ class Atomx(object):
             if isinstance(res, list):
                 return [getattr(models, model)(self, **m) for m in res]
             return getattr(models, model)(self, **res)
+        elif model_name == 'reporting':  # special case for `/reports` status
+            return {
+                'reports': [models.Report(self, **m) for m in res['reports']],
+                'scheduled': [models.ScheduledReport(self, **m) for m in res['scheduled']]
+            }
         return res
 
     def post(self, resource, json, **kwargs):

@@ -190,6 +190,28 @@ for m in __all__:
                        {'__doc__': ':class:`.AtomxModel` for {}'.format(m)})
 
 
+class ScheduledReport(object):
+    """A report scheduling object that you get back when registering a new scheduled report.
+    See the `scheduling section in the atomx wiki
+    <https://wiki.atomx.com/reporting#scheduling_reports>`_.
+    """
+
+    def __init__(self, session, id, query, **kwargs):
+        self.session = session
+        self.id = id
+        self.query = query
+
+    def __repr__(self):
+        return "ScheduledReport(id='{}', query={})".format(self.id, self.query)
+
+    def __eq__(self, other):
+        return self.id == getattr(other, 'id', 'INVALID')
+
+    def delete(self, session=None):
+        """Delete scheduled report"""
+        return self.session.delete('report', self.id)
+
+
 class Report(object):
     """Represents a `report` you get back from :meth:`atomx.Atomx.report`."""
 
