@@ -5,8 +5,6 @@ from os import path
 here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     README = f.read()
-with open(path.join(here, 'CHANGES.txt'), encoding='utf-8') as f:
-    CHANGES = f.read()
 with open(path.join(here, 'atomx', 'version.py')) as f:
     exec(f.read())  # defines VERSION and API_VERSION
 
@@ -25,7 +23,7 @@ setup(
     version=VERSION,
 
     description='python interface for the atomx api on https://api.atomx.com',
-    long_description=README + '\n\n' + CHANGES,
+    long_description=README,
 
     packages=find_packages(),
     exclude_package_data={'': ['.gitignore']},
