@@ -216,7 +216,7 @@ class Report(object):
     """Represents a `report` you get back from :meth:`atomx.Atomx.report`."""
 
     def __init__(self, session, query, fast, id, lines, error, link,
-                 started, finished, is_ready, duration, **kwargs):
+                 started, finished, is_ready, duration, name, **kwargs):
         self.session = session
         self.query = query
         self.fast = fast
@@ -227,6 +227,7 @@ class Report(object):
         self.started = started
         self.finished = finished
         self.duration = duration
+        self.name = name
 
         if is_ready:
             self._is_ready = is_ready

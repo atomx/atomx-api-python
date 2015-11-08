@@ -1,3 +1,9 @@
+1.5 (unreleased)
+----------------
+
+- :meth:`atomx.Atomx.report` takes ``name`` parameter to name reports
+
+
 1.4
 ---
 
@@ -21,6 +27,7 @@
   to there json counterpart
 - Add `save_response` parameter to :class:`atomx.Atomx` to save the response meta data
   of the last api call
+
 
 1.2
 ---

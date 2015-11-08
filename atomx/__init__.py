@@ -132,7 +132,7 @@ class Atomx(object):
         return search_result
 
     def report(self, scope=None, groups=None, metrics=None, where=None, from_=None, to=None,
-               timezone='UTC', emails=None, fast=True, when=None, interval=None):
+               timezone='UTC', emails=None, fast=True, when=None, interval=None, name=None):
         """Create a report.
 
         See the `reporting atomx wiki <https://wiki.atomx.com/reporting>`_
@@ -167,10 +167,13 @@ class Atomx(object):
             to speed up the query.
         :param str when: When should the scheduled report run. (daily, monthly, monday-sunday)
         :param str interval: Time period included in the scheduled report ('N days' or 'N month')
+        :param str name: Optional name for the report
         :return: A :class:`atomx.models.Report` model
         """
         report_json = {'timezone': timezone, 'fast': fast}
 
+        if name:
+            report_json['name'] = name
         if groups:
             report_json['groups'] = groups
         if metrics:
