@@ -16,11 +16,11 @@ from atomx.exceptions import (
     NoPandasInstalledError,
 )
 
-__all__ = ['Advertiser', 'Bidder', 'Browser', 'Campaign', 'Category', 'ConnectionType',
-           'ConversionPixel', 'Country', 'Creative', 'Datacenter', 'DeviceType',
-           'Domain', 'Fallback', 'Isp', 'Languages', 'Network', 'OperatingSystem',
-           'Placement', 'Profile', 'Publisher', 'Reason', 'Segment', 'SellerProfile',
-           'Site', 'Size', 'User']
+__all__ = ['AccountManager', 'Advertiser', 'Banned', 'Bidder', 'Browser', 'CampaignDebugReason',
+           'Campaign', 'Category', 'ConnectionType', 'ConversionPixel', 'Country', 'Creative',
+           'Datacenter', 'DeviceType', 'Domain', 'Fallback', 'Isp', 'Languages', 'Network',
+           'OperatingSystem', 'Placement', 'PlacementType', 'Profile', 'Publisher', 'Reason',
+           'Segment', 'SellerProfile', 'Site', 'Size', 'User', 'Visibility']
 
 
 class AtomxModel(object):

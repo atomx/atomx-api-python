@@ -365,7 +365,7 @@ class Atomx(object):
             del r_json[model_name]
             self.last_response = r_json
         model = get_model_name(model_name)
-        if model:
+        if model and res:
             if isinstance(res, list):
                 return [getattr(models, model)(self, **m) for m in res]
             return getattr(models, model)(self, **res)
