@@ -138,9 +138,10 @@ class Atomx(object):
         See the `reporting atomx wiki <https://wiki.atomx.com/reporting>`_
         for details about parameters and available groups, metrics.
 
-        :param str scope: either 'advertiser', 'publisher' or 'network' to select the type
-            of report. If undefined it tries to determine the `scope` automatically based
-            on the `groups` and `metrics` parameters and the access rights of the api user.
+        :param str scope: Specifies the report type. Should be one of:
+            'advertiser', 'publisher', 'network_managed', 'network_buy', 'network_sell'.
+            If undefined it tries to determine the `scope` automatically based
+            on the access rights of the api user.
         :param list groups: columns to group by.
         :param list metrics: columns to sum on.
         :param list where: is a list of expression lists.
@@ -182,22 +183,17 @@ class Atomx(object):
             raise MissingArgumentError('Either `groups` or `metrics` have to be set.')
 
         if scope is None:
-            for i in report_json.get('groups', []) + report_json.get('metrics', []):
-                if '_network' in i:
-                    scope = 'network'
-                    break
-            else:
-                user = self.user
-                if len(user.networks) > 0:
-                    pass  # user has network access so could be any report (leave scope as None)
-                elif len(user.publishers) > 0 and len(user.advertisers) == 0:
-                    scope = 'publishers'
-                elif len(user.advertisers) > 0 and len(user.publishers) == 0:
-                    scope = 'advertisers'
+            user = self.user
+            if len(user.networks) > 0:
+                pass  # user has network access so could be any report (leave scope as None)
+            elif len(user.publishers) > 0 and len(user.advertisers) == 0:
+                scope = 'publishers'
+            elif len(user.advertisers) > 0 and len(user.publishers) == 0:
+                scope = 'advertisers'
 
-                if scope is None:
-                    raise MissingArgumentError('Unable to detect scope automatically. '
-                                               'Please set `scope` parameter.')
+            if scope is None:
+                raise MissingArgumentError('Unable to detect scope automatically. '
+                                           'Please set `scope` parameter.')
         report_json['scope'] = scope
 
         if where:

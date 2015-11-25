@@ -2,6 +2,8 @@
 ----------------
 
 - :meth:`atomx.Atomx.report` takes ``name`` parameter to name reports
+- remove ``network`` scope in :meth:`atomx.Atomx.report` and add
+  ``network_managed``, ``network_buy``, ``network_sell``
 - Add new models:
     - :class:`atomx.models.AccountManager` (alias for `User`)
     - :class:`atomx.models.Banned` (alias for `Reason`)
