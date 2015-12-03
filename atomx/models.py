@@ -196,9 +196,11 @@ class ScheduledReport(object):
     <https://wiki.atomx.com/reporting#scheduling_reports>`_.
     """
 
-    def __init__(self, session, id, query, **kwargs):
+    def __init__(self, session, id, name, emails, query, **kwargs):
         self.session = session
         self.id = id
+        self.name = name
+        self.emails = emails
         self.query = query
 
     def __repr__(self):
@@ -207,9 +209,21 @@ class ScheduledReport(object):
     def __eq__(self, other):
         return self.id == getattr(other, 'id', 'INVALID')
 
+    def save(self, session=None):
+        """Update report `name` and `emails`"""
+
+        session = session or self.session
+        if not session:
+            raise NoSessionError
+        return session.put('report', self.id, {'name': self.name, 'emails': self.emails})
+
     def delete(self, session=None):
         """Delete scheduled report"""
-        return self.session.delete('report', self.id)
+
+        session = session or self.session
+        if not session:
+            raise NoSessionError
+        return session.delete('report', self.id)
 
 
 class Report(object):

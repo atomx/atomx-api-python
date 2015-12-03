@@ -236,9 +236,9 @@ class Atomx(object):
             self.last_response = r_json
 
         if is_scheduled_report:
-            return models.ScheduledReport(self, query=r.json()['query'], **report)
+            return models.ScheduledReport(self, **report)
 
-        return models.Report(self, query=r.json()['query'], **report)
+        return models.Report(self, **report)
 
     def report_status(self, report):
         """Get the status for a `report`.

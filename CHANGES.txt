@@ -5,11 +5,15 @@
 - remove ``network`` scope in :meth:`atomx.Atomx.report` and add
   ``network_managed``, ``network_buy``, ``network_sell``
 - Add new models:
-    - :class:`atomx.models.AccountManager` (alias for `User`)
-    - :class:`atomx.models.Banned` (alias for `Reason`)
-    - :class:`atomx.models.PlacementType`
-    - :class:`atomx.models.CampaignDebugReason`
-    - :class:`atomx.models.Visibility`
+
+  * :class:`atomx.models.AccountManager` (alias for `User`)
+  * :class:`atomx.models.Banned` (alias for `Reason`)
+  * :class:`atomx.models.PlacementType`
+  * :class:`atomx.models.CampaignDebugReason`
+  * :class:`atomx.models.Visibility`
+
+- Add :meth:`atomx.models.ScheduledReport.save` to edit ``name`` and ``emails``
+  of a :class:`atomx.models.ScheduledReport`
 
 
 1.4
