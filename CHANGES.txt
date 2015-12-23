@@ -14,6 +14,8 @@
 
 - Add :meth:`atomx.models.ScheduledReport.save` to edit ``name`` and ``emails``
   of a :class:`atomx.models.ScheduledReport`
+- :meth:`atomx.Atomx.get` also accepts a model class or instance as resource argument.
+  E.g.: ``atomx_api.get(atomx.models.Advertiser)`` or ``atomx_api.get(atomx.models.Advertiser(42))``
 
 
 1.4

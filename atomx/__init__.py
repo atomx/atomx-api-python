@@ -4,6 +4,7 @@ from datetime import (
     datetime,
     timedelta,
 )
+from inspect import isclass
 import requests
 from atomx.version import API_VERSION, VERSION
 from atomx import models
@@ -78,7 +79,7 @@ class Atomx(object):
                 raise InvalidCredentials
             raise APIError(r.json()['error'])
         self.auth_tkt = r.json()['auth_tkt']
-        self.user = models.User(**r.json()['user'])
+        self.user = models.User(session=self, **r.json()['user'])
 
     def logout(self):
         """Removes authentication token from session."""
@@ -236,9 +237,9 @@ class Atomx(object):
             self.last_response = r_json
 
         if is_scheduled_report:
-            return models.ScheduledReport(self, **report)
+            return models.ScheduledReport(session=self, **report)
 
-        return models.Report(self, **report)
+        return models.Report(session=self, **report)
 
     def report_status(self, report):
         """Get the status for a `report`.
@@ -314,6 +315,8 @@ class Atomx(object):
                 >>> publisher = atomx.get('publisher/23')
                 >>>> # or get the same publisher using the id as parameter
                 >>> publisher = atomx.get('publisher', 23)
+                >>>> # or use an atomx model
+                >>> publisher = atomx.get(atomx.models.Publisher(23))
                 >>> assert publisher.id == 23
                 >>> assert isinstance(publisher, atomx.models.Publisher)
 
@@ -347,7 +350,15 @@ class Atomx(object):
 
         :return: a class from :mod:`.models` or a list of models depending on param `resource`
         """
-        resource = resource.strip('/')
+        if isclass(resource) and issubclass(resource, models.AtomxModel):
+            resource = resource._resource_name
+        elif isinstance(resource, models.AtomxModel):
+            resource_path = resource._resource_name
+            if hasattr(resource, 'id'):
+                resource_path += '/' + str(resource.id)
+            resource = resource_path
+        else:
+            resource = resource.strip('/')
         for a in args:
             resource += '/' + str(a)
         r = self.session.get(self.api_endpoint + resource, params=kwargs)
@@ -363,12 +374,12 @@ class Atomx(object):
         model = get_model_name(model_name)
         if model and res:
             if isinstance(res, list):
-                return [getattr(models, model)(self, **m) for m in res]
-            return getattr(models, model)(self, **res)
+                return [getattr(models, model)(session=self, **m) for m in res]
+            return getattr(models, model)(session=self, **res)
         elif model_name == 'reporting':  # special case for `/reports` status
             return {
-                'reports': [models.Report(self, **m) for m in res['reports']],
-                'scheduled': [models.ScheduledReport(self, **m) for m in res['scheduled']]
+                'reports': [models.Report(session=self, **m) for m in res['reports']],
+                'scheduled': [models.ScheduledReport(session=self, **m) for m in res['scheduled']]
             }
         return res
 
@@ -394,7 +405,7 @@ class Atomx(object):
             self.last_response = r_json
         model = get_model_name(model_name)
         if model and isinstance(res, list):
-            return [getattr(models, model)(self, **m) for m in res]
+            return [getattr(models, model)(session=self, **m) for m in res]
         return res
 
     def put(self, resource, id, json, **kwargs):

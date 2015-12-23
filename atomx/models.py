@@ -8,6 +8,7 @@ try:  # py3
     from io import StringIO
 except ImportError:  # py2
     from StringIO import StringIO
+from atomx.utils import _class_property
 from atomx.exceptions import (
     NoSessionError,
     ModelNotFoundError,
@@ -26,15 +27,11 @@ __all__ = ['AccountManager', 'Advertiser', 'Banned', 'Bidder', 'Browser', 'Campa
 class AtomxModel(object):
     """A generic atomx model that the other models from :mod:`atomx.models` inherit from.
 
+    :param int id: Optional model ID. Can also be passed in via `attributes` as `id`.
     :param atomx.Atomx session: The :class:`atomx.Atomx` session to use for the api requests.
     :param attributes: model attributes
     """
-    def __init__(self, session=None, **attributes):
-        """Atomx model for {model}. test
-        :param session: session
-        :param attributes: attributes
-        :return: model.{model}
-        """
+    def __init__(self, id=None, session=None, **attributes):
         for k, v in attributes.items():
             if k.endswith('_at'):
                 try:
@@ -46,6 +43,8 @@ class AtomxModel(object):
                     attributes[k] = datetime.strptime(v, '%Y-%m-%d')
                 except (ValueError, TypeError):
                     pass
+        if id is not None:
+            attributes['id'] = id
 
         super(AtomxModel, self).__setattr__('session', session)
         super(AtomxModel, self).__setattr__('_attributes', attributes)
@@ -96,10 +95,10 @@ class AtomxModel(object):
     def __eq__(self, other):
         return self.id == getattr(other, 'id', 'INVALID')
 
-    @property
-    def _resource_name(self):
+    @_class_property
+    def _resource_name(cls):
         from atomx.utils import model_name_to_rest
-        return model_name_to_rest(self.__class__.__name__)
+        return model_name_to_rest(cls.__name__)
 
     @property
     def _dirty_json(self):
@@ -196,7 +195,7 @@ class ScheduledReport(object):
     <https://wiki.atomx.com/reporting#scheduling_reports>`_.
     """
 
-    def __init__(self, session, id, name, emails, query, **kwargs):
+    def __init__(self, id, session, name, emails, query, **kwargs):
         self.session = session
         self.id = id
         self.name = name
@@ -229,7 +228,7 @@ class ScheduledReport(object):
 class Report(object):
     """Represents a `report` you get back from :meth:`atomx.Atomx.report`."""
 
-    def __init__(self, session, query, fast, id, lines, error, link,
+    def __init__(self, id, session, query, fast, lines, error, link,
                  started, finished, is_ready, duration, name, **kwargs):
         self.session = session
         self.query = query

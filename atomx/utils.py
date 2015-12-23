@@ -72,3 +72,12 @@ def model_name_to_rest(name):
             r += '-'
         r += name[i]
     return r.lower()
+
+
+class _class_property(object):
+    """Decorator to create @classmethod and @property"""
+    def __init__(self, f):
+        self.f = f
+
+    def __get__(self, obj, owner):
+        return self.f(owner)
