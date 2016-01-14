@@ -35,7 +35,7 @@ extensions = [
     'sphinx.ext.intersphinx',
 ]
 
-intersphinx_mapping = {'python': ('https://docs.python.org/3.4', None)}
+intersphinx_mapping = {'python': ('https://docs.python.org/3.5', None)}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -53,7 +53,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'atomx-api-python'
-copyright = '2015, Spot Media Solutions Sdn. Bhd.'
+copyright = '2015-2016, Spot Media Solutions Sdn. Bhd.'
 author = 'Spot Media Solutions Sdn. Bhd.'
 
 # The version info for the project you're documenting, acts as replacement for

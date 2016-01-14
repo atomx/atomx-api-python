@@ -95,6 +95,13 @@ class AtomxModel(object):
     def __eq__(self, other):
         return self.id == getattr(other, 'id', 'INVALID')
 
+    def __getstate__(self):  # for pickle dump
+        return self._attributes
+
+    def __setstate__(self, state):  # for pickle load
+        self.__init__(**state)
+
+
     @_class_property
     def _resource_name(cls):
         from atomx.utils import model_name_to_rest

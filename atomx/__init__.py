@@ -23,7 +23,7 @@ from atomx.exceptions import (
 __title__ = 'atomx'
 __version__ = VERSION
 __author__ = 'Spot Media Solutions Sdn. Bhd.'
-__copyright__ = 'Copyright 2015 Spot Media Solutions Sdn. Bhd.'
+__copyright__ = 'Copyright 2015-2016 Spot Media Solutions Sdn. Bhd.'
 
 API_ENDPOINT = 'https://api.atomx.com/{}'.format(API_VERSION)
 
