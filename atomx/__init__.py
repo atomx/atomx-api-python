@@ -123,6 +123,7 @@ class Atomx(object):
         if self.save_response:
             del r_json['search']
             self.last_response = r_json
+            self.last_response['_headers'] = r.headers
 
         # convert publisher, creative dicts etc from search result to Atomx.model
         for m in search_result.keys():
@@ -235,6 +236,7 @@ class Atomx(object):
         if self.save_response:
             del r_json['report']
             self.last_response = r_json
+            self.last_response['_headers'] = r.headers
 
         if is_scheduled_report:
             return models.ScheduledReport(session=self, **report)
@@ -262,6 +264,7 @@ class Atomx(object):
 
         if self.save_response:
             self.last_response = r.json()
+            self.last_response['_headers'] = r.headers
 
         return r.json()['report']
 
@@ -371,6 +374,7 @@ class Atomx(object):
         if self.save_response:
             del r_json[model_name]
             self.last_response = r_json
+            self.last_response['_headers'] = r.headers
         model = get_model_name(model_name)
         if model and res:
             if isinstance(res, list):
@@ -403,6 +407,7 @@ class Atomx(object):
         if self.save_response:
             del r_json[model_name]
             self.last_response = r_json
+            self.last_response['_headers'] = r.headers
         model = get_model_name(model_name)
         if model and isinstance(res, list):
             return [getattr(models, model)(session=self, **m) for m in res]
@@ -429,6 +434,7 @@ class Atomx(object):
         if self.save_response:
             del r_json[model_name]
             self.last_response = r_json
+            self.last_response['_headers'] = r.headers
         return res
 
     def delete(self, resource, *args, **kwargs):
@@ -452,6 +458,7 @@ class Atomx(object):
         if self.save_response:
             del r_json[model_name]
             self.last_response = r_json
+            self.last_response['_headers'] = r.headers
         return res
 
     def save(self, model):
