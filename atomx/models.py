@@ -17,7 +17,7 @@ from atomx.exceptions import (
     NoPandasInstalledError,
 )
 
-__all__ = ['AccountManager', 'Advertiser', 'Banned', 'Bidder', 'Browser', 'CampaignDebugReason',
+__all__ = ['AccountManager', 'Advertiser', 'BanReason', 'Bidder', 'Browser', 'CampaignDebugReason',
            'Campaign', 'Category', 'ConnectionType', 'ConversionPixel', 'Country', 'Creative',
            'Datacenter', 'DeviceType', 'Domain', 'Fallback', 'Isp', 'Languages', 'Network',
            'OperatingSystem', 'Placement', 'PlacementType', 'Profile', 'Publisher', 'Reason',

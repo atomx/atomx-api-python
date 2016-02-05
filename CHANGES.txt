@@ -7,7 +7,7 @@
 - Add new models:
 
   * :class:`atomx.models.AccountManager` (alias for `User`)
-  * :class:`atomx.models.Banned` (alias for `Reason`)
+  * :class:`atomx.models.BanReason`
   * :class:`atomx.models.PlacementType`
   * :class:`atomx.models.CampaignDebugReason`
   * :class:`atomx.models.Visibility`
