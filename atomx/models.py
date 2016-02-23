@@ -17,7 +17,7 @@ from atomx.exceptions import (
     NoPandasInstalledError,
 )
 
-__all__ = ['AccountManager', 'Advertiser', 'BanReason', 'Bidder', 'Browser', 'CampaignDebugReason',
+__all__ = ['AccountManager', 'Advertiser', 'Bidder', 'Browser', 'CampaignDebugReason',
            'Campaign', 'Category', 'ConnectionType', 'ConversionPixel', 'Country', 'Creative',
            'Datacenter', 'DeviceType', 'Domain', 'Fallback', 'Isp', 'Languages', 'Network',
            'OperatingSystem', 'Placement', 'PlacementType', 'Profile', 'Publisher', 'Reason',
@@ -81,9 +81,9 @@ class AtomxModel(object):
     def __delattr__(self, item):
         if item in self._dirty:
             self._dirty.remove(item)
-        else:
-            self._attributes[item] = None
-            self._dirty.add(item)
+
+        self._attributes[item] = [] if isinstance(self._attributes[item], list) else None
+        self._dirty.add(item)
 
     def __dir__(self):
         """Manually add dynamic attributes for autocomplete"""
@@ -189,6 +189,27 @@ class AtomxModel(object):
         res = session.get(self._resource_name, self.id)
         self.__init__(session=session, **res.json)
         return self
+
+    def history(self, session=None, offset=0, limit=100, sort='date.asc'):
+        """Show the changelog of the model.
+
+        :param session: The :class:`atomx.Atomx` session to use for the api call.
+            (Optional if you specified a `session` at initialization)
+        :param int offset: Skip first ``offset`` history entries. (default: 0)
+        :param int limit: Only return ``limit`` history entries. (default: 100)
+        :param str sort: Sort by `date.asc` or `date.desc`. (default: 'date.asc')
+        :return: `list` of `dict`s with `date`, `user` and the attributes that changed (`history`).
+        :rtype: list
+        """
+        session = session or self.session
+        if not session:
+            raise NoSessionError
+        if not hasattr(self, 'id'):
+            raise ModelNotFoundError("Can't reload without 'id' parameter. "
+                                     "Forgot to save() first?")
+        res = session.get('history', self._resource_name, self.id,
+                          offset=offset, limit=limit, sort=sort)
+        return res
 
 
 for m in __all__:

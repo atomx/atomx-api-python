@@ -95,6 +95,13 @@ Or to get the advertiser for a profile, just:
     advertiser = profiles[0].advertiser
 
 
+You can get a list of all changes with :meth:`atomx.models.AtomxModel.history`.
+
+.. code-block:: python
+
+    advertiser.history()
+
+
 Updating models
 ---------------
 

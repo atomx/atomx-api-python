@@ -7,7 +7,6 @@
 - Add new models:
 
   * :class:`atomx.models.AccountManager` (alias for `User`)
-  * :class:`atomx.models.BanReason`
   * :class:`atomx.models.PlacementType`
   * :class:`atomx.models.CampaignDebugReason`
   * :class:`atomx.models.Visibility`
@@ -18,6 +17,7 @@
   E.g.: ``atomx_api.get(atomx.models.Advertiser)`` or ``atomx_api.get(atomx.models.Advertiser(42))``
 - Add :mod:`pickle` support for :mod:`atomx.models`.
 - Save HTTP headers in :attr:`atomx.Atomx.last_response`.
+- Add history support. :meth:`atomx.models.AtomxModel.history`.
 
 
 1.4

@@ -64,6 +64,7 @@ Example Usage
     publisher = s['publisher'][0]  # get the first publisher..
     publisher.reload()  # .. and load all the data
     print(publisher)  # now all publisher data is there
+    publisher.history()  # gets all changes made to this publisher
 
 
     # reporting example
