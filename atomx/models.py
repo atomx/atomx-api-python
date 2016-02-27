@@ -17,8 +17,9 @@ from atomx.exceptions import (
     NoPandasInstalledError,
 )
 
-__all__ = ['AccountManager', 'Advertiser', 'Bidder', 'Browser', 'CampaignDebugReason',
-           'Campaign', 'Category', 'ConnectionType', 'ConversionPixel', 'Country', 'Creative',
+__all__ = ['AccountManager', 'Advertiser', 'Bidder', 'Browser',
+           'CampaignDebugReason', 'Campaign', 'Category', 'ConnectionType',
+           'ConversionPixel', 'Country', 'Creative', 'CreativeAttribute',
            'Datacenter', 'DeviceType', 'Domain', 'Fallback', 'Isp', 'Languages', 'Network',
            'OperatingSystem', 'Placement', 'PlacementType', 'Profile', 'Publisher', 'Reason',
            'Segment', 'SellerProfile', 'Site', 'Size', 'User', 'Visibility']
@@ -66,8 +67,7 @@ class AtomxModel(object):
         # try to load model attribute from server if possible
         if not item.startswith('_') and item not in self._attributes and self.session:
             try:
-                v = self.session.get(self.__class__.__name__ + '/' +
-                                     str(self.id) + '/' + str(item))
+                v = self.session.get(self.__class__._resource_name, self.id, item)
                 self._attributes[item] = v
             except APIError as e:
                 raise AttributeError(e)

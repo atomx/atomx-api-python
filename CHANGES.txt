@@ -7,8 +7,9 @@
 - Add new models:
 
   * :class:`atomx.models.AccountManager` (alias for `User`)
-  * :class:`atomx.models.PlacementType`
   * :class:`atomx.models.CampaignDebugReason`
+  * :class:`atomx.models.CreativeAttribute`
+  * :class:`atomx.models.PlacementType`
   * :class:`atomx.models.Visibility`
 
 - Add :meth:`atomx.models.ScheduledReport.save` to edit ``name`` and ``emails``
