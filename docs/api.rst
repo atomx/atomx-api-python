@@ -19,9 +19,6 @@ Models
 .. automodule:: atomx.models
     :members:
 
-.. autoclass:: atomx.models.ScheduledReport
-    :members:
-
 .. autoclass:: atomx.models.Report
     :members:
 

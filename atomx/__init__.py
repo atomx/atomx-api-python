@@ -42,50 +42,48 @@ class Atomx(object):
         (without the resource payload) in :attr:`.Atomx.last_response`. (default: `True`)
     :return: :class:`.Atomx` session to interact with the api
     """
-    def __init__(self, email, password, api_endpoint=API_ENDPOINT, save_response=True):
-        self.auth_tkt = None
+    def __init__(self, email, password,
+                 api_endpoint=API_ENDPOINT, save_response=True, expiration=None):
+        self.auth_token = None
         self.user = None
-        self.email = email
-        self.password = password
         self.api_endpoint = api_endpoint.rstrip('/') + '/'
         self.save_response = save_response
         #: Contains the response of the last api call, if `save_response` was set `True`
         self.last_response = None
-        self.session = requests.Session()
-        self.login()
+        self.login(email, password, expiration)
 
-    def login(self, email=None, password=None):
+    @property
+    def _auth_header(self):
+        if self.auth_token:
+            return {'Authorization': 'Bearer ' + self.auth_token}
+
+    def login(self, email, password, expiration=None):
         """Gets new authentication token for user ``email``.
 
         This method is automatically called in :meth:`__init__` so
         you rarely have to call this method directly.
 
-        :param str email: Use this email instead of the one provided at
-            construction time. (optional)
-        :param str password: Use this password instead of the one provided at
-            construction time. (optional)
+        :param str email: Email to use for login.
+        :param str password: Password to use for login.
+        :param int expiration: Number of seconds that the auth token should be valid. (optional)
         :return: None
         :raises: :class:`.exceptions.InvalidCredentials` if ``email``/``password`` is wrong
         """
-        if email:
-            self.email = email
-        if password:
-            self.password = password
-
-        r = self.session.post(self.api_endpoint + 'login',
-                              json={'email': self.email, 'password': self.password})
+        json = {'email': email, 'password': password}
+        if expiration:
+            json['expiration'] = expiration
+        r = requests.post(self.api_endpoint + 'login', json=json)
         if not r.ok:
             if r.status_code == 401:
                 raise InvalidCredentials
             raise APIError(r.json()['error'])
-        self.auth_tkt = r.json()['auth_tkt']
+        self.auth_token = r.json()['auth_token']
         self.user = models.User(session=self, **r.json()['user'])
 
     def logout(self):
         """Removes authentication token from session."""
-        self.auth_tkt = None
+        self.auth_token = None
         self.user = None
-        self.session.get(self.api_endpoint + 'logout')
 
     def search(self, query):
         """Search for ``query``.
@@ -114,7 +112,9 @@ class Atomx(object):
         :param str query: keyword to search for.
         :return: dict with list of :mod:`.models` as values
         """
-        r = self.session.get(self.api_endpoint + 'search', params={'q': query})
+        r = requests.get(self.api_endpoint + 'search',
+                         params={'q': query},
+                         headers=self._auth_header)
         r_json = r.json()
         if not r.ok:
             raise APIError(r_json['error'])
@@ -134,7 +134,8 @@ class Atomx(object):
         return search_result
 
     def report(self, scope=None, groups=None, metrics=None, where=None, from_=None, to=None,
-               timezone='UTC', emails=None, fast=True, when=None, interval=None, name=None):
+               timezone='UTC', emails=None, when=None, interval=None, name=None,
+               sort=None, limit=None, offset=None):
         """Create a report.
 
         See the `reporting atomx wiki <https://wiki.atomx.com/reporting>`_
@@ -164,16 +165,15 @@ class Atomx(object):
         :param emails: One or multiple email addresses that should get
             notified once the report is finished and ready to download.
         :type emails: str or list
-        :param bool fast: if `False` the report will always be run against the low level data.
-            This is useful for billing reports for example.
-            The default is `True` which means it will always try to use aggregate data
-            to speed up the query.
         :param str when: When should the scheduled report run. (daily, monthly, monday-sunday)
         :param str interval: Time period included in the scheduled report ('N days' or 'N month')
-        :param str name: Optional name for the report
+        :param str name: Optional name for the report.
+        :param str or list sort: List of columns to sort by.
+        :param int limit: Number of rows to return
+        :param int offset: Number of rows to skip.
         :return: A :class:`atomx.models.Report` model
         """
-        report_json = {'timezone': timezone, 'fast': fast}
+        report_json = {'timezone': timezone}
 
         if name:
             report_json['name'] = name
@@ -227,7 +227,17 @@ class Atomx(object):
                 emails = [emails]
             report_json['emails'] = emails
 
-        r = self.session.post(self.api_endpoint + 'report', json=report_json)
+        params = {}
+        if limit:
+            params['limit'] = limit
+        if offset:
+            params['offset'] = offset
+        if sort:
+            if isinstance(sort, list):
+                sort = ','.join(sort)
+            params['sort'] = sort
+        r = requests.post(self.api_endpoint + 'report',
+                          params=params, json=report_json, headers=self._auth_header)
         r_json = r.json()
         if not r.ok:
             raise APIError(r_json['error'])
@@ -238,64 +248,7 @@ class Atomx(object):
             self.last_response = r_json
             self.last_response['_headers'] = r.headers
 
-        if is_scheduled_report:
-            return models.ScheduledReport(session=self, **report)
-
         return models.Report(session=self, **report)
-
-    def report_status(self, report):
-        """Get the status for a `report`.
-
-        This is typically used by calling :meth:`.models.Report.status`.
-
-        :param report: Either a :class:`str` that contains the ``id`` of
-            of the report or an :class:`.models.Report` instance.
-        :type report: :class:`.models.Report` or :class:`list`
-        :return: :class:`dict` containing the report status.
-        """
-        if isinstance(report, models.Report):
-            report_id = report.id
-        else:
-            report_id = report
-
-        r = self.session.get(self.api_endpoint + 'report/' + report_id, params={'status': True})
-        if not r.ok:
-            raise APIError(r.json()['error'])
-
-        if self.save_response:
-            self.last_response = r.json()
-            self.last_response['_headers'] = r.headers
-
-        return r.json()['report']
-
-    def report_get(self, report, sort=None, limit=None, offset=None):
-        """Get the content (csv) of a :class:`.models.Report`
-
-        Typically used by calling :meth:`.models.Report.content` or
-        :meth:`.models.Report.pandas`.
-
-        :param report: Either a :class:`str` that contains the ``id`` of
-            of the report or an :class:`.models.Report` instance.
-        :type report: :class:`.models.Report` or :class:`list`
-        :return: :class:`str` with the report content.
-        """
-        if isinstance(report, models.Report):
-            report_id = report.id
-        else:
-            report_id = report
-
-        params = {}
-        if limit:
-            params['limit'] = int(limit)
-        if offset:
-            params['offset'] = int(offset)
-        if sort:
-            params['sort'] = sort
-
-        r = self.session.get(self.api_endpoint + 'report/' + report_id, params=params)
-        if not r.ok:
-            raise APIError(r.json()['error'])
-        return r.content.decode()
 
     def get(self, resource, *args, **kwargs):
         """Returns a list of models from :mod:`.models` if you query for
@@ -355,7 +308,7 @@ class Atomx(object):
         """
         if isclass(resource) and issubclass(resource, models.AtomxModel):
             resource = resource._resource_name
-        elif isinstance(resource, models.AtomxModel):
+        elif hasattr(resource, '_resource_name'):
             resource_path = resource._resource_name
             if hasattr(resource, 'id'):
                 resource_path += '/' + str(resource.id)
@@ -364,7 +317,7 @@ class Atomx(object):
             resource = resource.strip('/')
         for a in args:
             resource += '/' + str(a)
-        r = self.session.get(self.api_endpoint + resource, params=kwargs)
+        r = requests.get(self.api_endpoint + resource, params=kwargs, headers=self._auth_header)
         if not r.ok:
             raise APIError(r.json()['error'])
 
@@ -383,7 +336,7 @@ class Atomx(object):
         elif model_name == 'reporting':  # special case for `/reports` status
             return {
                 'reports': [models.Report(session=self, **m) for m in res['reports']],
-                'scheduled': [models.ScheduledReport(session=self, **m) for m in res['scheduled']]
+                'scheduled': [models.Report(session=self, **m) for m in res['scheduled']]
             }
         return res
 
@@ -397,8 +350,8 @@ class Atomx(object):
         :param kwargs: URL Parameters of the request.
         :return: :class:`dict` with the newly created resource.
         """
-        r = self.session.post(self.api_endpoint + resource.strip('/'),
-                              json=json, params=kwargs)
+        r = requests.post(self.api_endpoint + resource.strip('/'),
+                          json=json, params=kwargs, headers=self._auth_header)
         r_json = r.json()
         if not r.ok:
             raise APIError(r_json['error'])
@@ -424,8 +377,8 @@ class Atomx(object):
         :param kwargs: URL Parameters of the request.
         :return: :class:`dict` with the modified resource.
         """
-        r = self.session.put(self.api_endpoint + resource.strip('/') + '/' + str(id),
-                             json=json, params=kwargs)
+        r = requests.put(self.api_endpoint + resource.strip('/') + '/' + str(id),
+                             json=json, params=kwargs, headers=self._auth_header)
         r_json = r.json()
         if not r.ok:
             raise APIError(r_json['error'])
@@ -449,7 +402,7 @@ class Atomx(object):
         resource = resource.strip('/')
         for a in args:
             resource += '/' + str(a)
-        r = self.session.delete(self.api_endpoint + resource, params=kwargs)
+        r = requests.delete(self.api_endpoint + resource, params=kwargs, headers=self._auth_header)
         r_json = r.json()
         if not r.ok:
             raise APIError(r_json['error'])

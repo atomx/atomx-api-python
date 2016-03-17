@@ -22,7 +22,8 @@ __all__ = ['AccountManager', 'Advertiser', 'Bidder', 'Browser',
            'ConversionPixel', 'Country', 'Creative', 'CreativeAttribute',
            'Datacenter', 'DeviceType', 'Domain', 'Fallback', 'Isp', 'Languages', 'Network',
            'OperatingSystem', 'Placement', 'PlacementType', 'Profile', 'Publisher', 'Reason',
-           'Segment', 'SellerProfile', 'Site', 'Size', 'User', 'Visibility']
+           'Segment', 'SellerProfile', 'Site', 'Size', 'User', 'Visibility',
+           'Report']
 
 
 class AtomxModel(object):
@@ -52,7 +53,7 @@ class AtomxModel(object):
         super(AtomxModel, self).__setattr__('_dirty', set())  # list of changed attributes
 
     def __getattr__(self, item):
-        from .utils import get_attribute_model_name
+        from atomx.utils import get_attribute_model_name
         model_name = get_attribute_model_name(item)
         attr = self._attributes.get(item)
         # if requested attribute item is a valid model name and and int or
@@ -100,7 +101,6 @@ class AtomxModel(object):
 
     def __setstate__(self, state):  # for pickle load
         self.__init__(**state)
-
 
     @_class_property
     def _resource_name(cls):
@@ -217,24 +217,34 @@ for m in __all__:
                        {'__doc__': ':class:`.AtomxModel` for {}'.format(m)})
 
 
-class ScheduledReport(object):
-    """A report scheduling object that you get back when registering a new scheduled report.
-    See the `scheduling section in the atomx wiki
-    <https://wiki.atomx.com/reporting#scheduling_reports>`_.
-    """
+class Report(object):
+    """Represents a `report` you get back from :meth:`atomx.Atomx.report`."""
 
-    def __init__(self, id, session, name, emails, query, **kwargs):
+    def __init__(self, id, query=None, name=None, emails=None, length=None, totals=None,
+                 columns=None, created_at=None, data=None, user_id=None, session=None,
+                 is_scheduled_report=False, **kwargs):
         self.session = session
         self.id = id
+        self.user_id = user_id
         self.name = name
         self.emails = emails
         self.query = query
+        self.data = data
+        self.length = length
+        self.totals = totals
+        self.columns = columns
+        self.created_at = created_at
+        self.is_scheduled_report = is_scheduled_report
 
     def __repr__(self):
-        return "ScheduledReport(id='{}', query={})".format(self.id, self.query)
+        return "Report(created_at={}, query={})".format(self.created_at, self.query)
 
     def __eq__(self, other):
         return self.id == getattr(other, 'id', 'INVALID')
+
+    @_class_property
+    def _resource_name(cls):
+        return 'report'
 
     def save(self, session=None):
         """Update report `name` and `emails`"""
@@ -245,103 +255,19 @@ class ScheduledReport(object):
         return session.put('report', self.id, {'name': self.name, 'emails': self.emails})
 
     def delete(self, session=None):
-        """Delete scheduled report"""
+        """Delete report"""
 
         session = session or self.session
         if not session:
             raise NoSessionError
         return session.delete('report', self.id)
 
-
-class Report(object):
-    """Represents a `report` you get back from :meth:`atomx.Atomx.report`."""
-
-    def __init__(self, id, session, query, fast, lines, error, link,
-                 started, finished, is_ready, duration, name, **kwargs):
-        self.session = session
-        self.query = query
-        self.fast = fast
-        self.id = id
-        self.lines = lines
-        self.error = error
-        self.link = link
-        self.started = started
-        self.finished = finished
-        self.duration = duration
-        self.name = name
-
-        if is_ready:
-            self._is_ready = is_ready
-
-    def __repr__(self):
-        return "Report(id='{}', is_ready={}, query={})".format(self.id, self.is_ready, self.query)
-
-    def __eq__(self, other):
-        return self.id == getattr(other, 'id', 'INVALID')
-
-    @property
-    def is_ready(self):
-        """Returns ``True`` if the :class:`.Report` is ready, ``False`` otherwise."""
-        if hasattr(self, '_is_ready'):
-            return self._is_ready
-        report_status = self.session.report_status(self)
-        # update attributes
-        for s in ['error', 'lines', 'started', 'finished', 'duration']:
-            setattr(self, s, report_status[s])
-        # don't query status again if report is ready
-        if report_status['is_ready']:
-            self._is_ready = True
-            return True
-        return False
-
-    def reload(self, session=None):
-        """Reload the `report` status. (alias for :meth:`Report.status`)."""
-        self.session = session or self.session
-        return self.status
-
-    @property
-    def status(self):
-        """Reload the :class:`Report` status"""
-        if not self.session:
-            raise NoSessionError
-        if not hasattr(self, 'id'):
-            raise ModelNotFoundError("Can't get status without 'id'. "
-                                     "Create a report with :meth:`atomx.Atomx.report_get`.")
-        status = self.session.report_status(self)
-        self.__init__(session=self.session, **status)
-        return self
-
-    def get(self, sort=None, limit=None, offset=None):
-        """Get the first ``limit`` lines of the report ``content``
-        and in the specified ``sort`` order.
-
-        :param str sort: defines the sort order of the report content.
-            ``sort`` can be `column_name`[.asc|.desc][,column_name[.asc|.desc]]`...
-        :param int limit: limit the amount of lines to return (defaults to no limit)
-        :param int offset: Skip the first `offset` number of lines (defaults to none)
-        :return: report content
-        """
-        if not self.is_ready:
-            raise ReportNotReadyError()
-        return self.session.report_get(self, sort=sort, limit=limit, offset=offset)
-
-    @property
-    def content(self):
-        """Returns the raw content (csv) of the `report`."""
-        if not self.is_ready:
-            raise ReportNotReadyError()
-        return self.session.report_get(self)
-
-    @property
-    def csv(self):
-        """Returns the report content (csv) as a list of lists."""
-        if not self.is_ready:
-            raise ReportNotReadyError()
-        return list(csv.reader(self.content.splitlines(), delimiter='\t'))
-
     @property
     def pandas(self):
         """Returns the content of the `report` as a pandas data frame."""
+        if hasattr(self, '_pandas_df'):
+            return self._pandas_df
+
         try:
             import pandas as pd
         except ImportError:
@@ -349,5 +275,14 @@ class Report(object):
                                          'have to have pandas installed. '
                                          'Do `pip install pandas` in your command line.')
 
-        return pd.read_csv(StringIO(self.content), sep='\t',
-                           names=self.query.get('groups', []) + self.query.get('sums', []))
+        res = pd.DataFrame(self.data, columns=self.columns)
+        groups = self.query.get('groups', [])
+        if 'hour' in groups:
+            res.index = pd.to_datetime(res.pop('hour'))
+        elif 'day' in groups:
+            res.index = pd.to_datetime(res.pop('day'))
+        elif 'month' in groups:
+            res.index = pd.to_datetime(res.pop('month'))
+
+        self._pandas_df = res
+        return res

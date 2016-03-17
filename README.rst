@@ -69,15 +69,12 @@ Example Usage
 
     # reporting example
     # get a report for a specific publisher
-    report = atomx.report(scope='publisher', groups=['hour_formatted'], sums=['impressions', 'clicks'], where=[['publisher_id', '==', 42]], from_='2015-02-08 00:00:00', to='2015-02-09 00:00:00', timezone='America/Los_Angeles')
+    report = atomx.report(scope='publisher', groups=['hour'], metrics=['impressions', 'clicks'], where=[['publisher_id', '==', 42]], from_='2015-02-08 00:00:00', to='2015-02-09 00:00:00', timezone='America/Los_Angeles')
     # check if report is ready
     print(report.is_ready)
     # if pandas is installed you can get the pandas dataframe with `report.pandas`
     # you can also get the report csv in `report.content` without pandas
-    df = report.pandas
-    # set index to datetime
-    import pandas as pd
-    df.index = pd.to_datetime(df.pop('hour_formatted'))
+    df = report.pandas  # A datetime index is automatically set when group by a hour/day/month.
     # calculate mean, median, std per hour
     means = df.resample('H', how=['mean', 'median', 'std'])
     # and plot impression and clicks per day
