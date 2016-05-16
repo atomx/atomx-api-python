@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import csv
 import pprint
 from decimal import Decimal
 from datetime import datetime, date
@@ -13,7 +12,6 @@ from atomx.exceptions import (
     NoSessionError,
     ModelNotFoundError,
     APIError,
-    ReportNotReadyError,
     NoPandasInstalledError,
 )
 

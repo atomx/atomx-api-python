@@ -1,5 +1,5 @@
-1.5 (unreleased)
-----------------
+1.5
+---
 
 - :meth:`atomx.Atomx.report` takes ``name`` parameter to name reports
 - remove ``network`` scope in :meth:`atomx.Atomx.report` and add

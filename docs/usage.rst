@@ -70,6 +70,19 @@ E.g.
     # is equivalent to atomx.get('advertiser/42/profiles')
 
 
+You can also use a class or instance of :mod:`atomx.models` in a get requests.
+E.g. all of those api calls request the same resource:
+
+.. code-block:: python
+
+    from atomx.models import Advertiser
+
+    atomx.get('advertiser/42')  # all in 1 string
+    atomx.get('advertiser', 42)  # model, id split up
+    atomx.get(Advertiser, 42)  # using :class:`atomx.models.Advertiser`
+    atomx.get(Advertiser(42))  # using instance of :class:`atomx.models.Advertiser`
+
+
 Or get all domains where the hostname contains `atom`:
 
 .. code-block:: python
@@ -183,16 +196,22 @@ to create a report.
 
 .. code-block:: python
 
-    # reporting example
+    from datetime import datetime, timedelta
+
+    now = datetime.utcnow()
+    last_week = now - timedelta(days=7)
+
     # get a report for a specific publisher
-    report = atomx.report(scope='publisher', groups=['hour'], metrics=['impressions', 'clicks'], where=[['publisher_id', '==', 42]], from_='2015-02-08 00:00:00', to='2015-02-09 00:00:00', timezone='America/Los_Angeles')
-    # check if report is ready
-    print(report.is_ready)
+    report = atomx.report(scope='publisher', groups=['hour'], metrics=['impressions', 'clicks'], where=[['publisher_id', '==', 42]], from_=last_week, to=now, timezone='America/Los_Angeles')
+
+    report.length  # get the number of rows returned
+    report.totals  # get the total values
+
     # if pandas is installed you can get the pandas dataframe with `report.pandas`
     # you can also get the report csv in `report.content` without pandas
     df = report.pandas  # A datetime index is automatically set when group by a hour/day/month.
     # calculate mean, median, std per hour
-    means = df.resample('H', how=['mean', 'median', 'std'])
+    means = df.resample('H').apply(['mean', 'median', 'std'])
     # and plot impression and clicks per day
     means['impressions'].plot()
     means['clicks'].plot()

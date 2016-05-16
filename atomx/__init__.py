@@ -151,8 +151,7 @@ class Atomx(object):
             An expression list is in the form of ``[column, op, value]``:
 
                 - ``column`` can be any of the ``groups`` or ``metrics`` parameter columns.
-                - ``op`` can be any of ``==``, ``!=``, ``<=``, ``>=``,
-                  ``<``, ``>``, ``in`` or ``not in`` as a string.
+                - ``op`` can be any of ``==``, ``!=``, ``in`` or ``not in`` as a string.
                 - ``value`` is either a number or in case of ``in``
                   and ``not in`` a list of numbers.
 
@@ -201,13 +200,11 @@ class Atomx(object):
         if where:
             report_json['where'] = where
 
-        if when and interval:
-            is_scheduled_report = True
+        if when and interval:  # scheduled report
             report_json['when'] = when
             report_json['interval'] = interval
-        else:
-            is_scheduled_report = False
 
+        else:  # normal report
             if from_ is None:
                 from_ = datetime.now() - timedelta(days=7)
             if isinstance(from_, datetime):
