@@ -1,3 +1,9 @@
+1.5.1 (unreleased)
+------------------
+
+- :meth:`atomx.Atomx.login` takes ``totp`` parameter for users that have 2-factor auth enabled.
+
+
 1.5
 ---
 

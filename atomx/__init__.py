@@ -36,13 +36,14 @@ class Atomx(object):
 
     :param str email: email address of your atomx user
     :param str password:  password of your atomx user
+    :param str totp: 6 digit auth token if the account has 2-factor authentication enabled.
     :param str api_endpoint: url for connections to the api
         (defaults to `https://api.atomx.com/{API_VERSION}`)
     :param bool save_response: If `True` save the last api response meta info
         (without the resource payload) in :attr:`.Atomx.last_response`. (default: `True`)
     :return: :class:`.Atomx` session to interact with the api
     """
-    def __init__(self, email, password,
+    def __init__(self, email, password, totp=None,
                  api_endpoint=API_ENDPOINT, save_response=True, expiration=None):
         self.auth_token = None
         self.user = None
@@ -50,14 +51,14 @@ class Atomx(object):
         self.save_response = save_response
         #: Contains the response of the last api call, if `save_response` was set `True`
         self.last_response = None
-        self.login(email, password, expiration)
+        self.login(email, password, totp, expiration)
 
     @property
     def _auth_header(self):
         if self.auth_token:
             return {'Authorization': 'Bearer ' + self.auth_token}
 
-    def login(self, email, password, expiration=None):
+    def login(self, email, password, totp=None, expiration=None):
         """Gets new authentication token for user ``email``.
 
         This method is automatically called in :meth:`__init__` so
@@ -65,11 +66,14 @@ class Atomx(object):
 
         :param str email: Email to use for login.
         :param str password: Password to use for login.
+        :param str totp: 6 digit auth token if the account has 2-factor authentication enabled.
         :param int expiration: Number of seconds that the auth token should be valid. (optional)
         :return: None
         :raises: :class:`.exceptions.InvalidCredentials` if ``email``/``password`` is wrong
         """
         json = {'email': email, 'password': password}
+        if totp:
+            json['totp'] = str(totp)
         if expiration:
             json['expiration'] = expiration
         r = requests.post(self.api_endpoint + 'login', json=json)
