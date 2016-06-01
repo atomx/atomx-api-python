@@ -2,7 +2,7 @@
 ------------------
 
 - :meth:`atomx.Atomx.login` takes ``totp`` parameter for users that have 2-factor auth enabled.
-
+- :meth:`atomx.Atomx.search` takes ``index`` parameter to only search specific models.
 
 1.5
 ---

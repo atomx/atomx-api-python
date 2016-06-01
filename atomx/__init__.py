@@ -89,7 +89,7 @@ class Atomx(object):
         self.auth_token = None
         self.user = None
 
-    def search(self, query):
+    def search(self, query, index=None):
         """Search for ``query``.
 
         Returns a `dict` with all found results for:
@@ -114,10 +114,17 @@ class Atomx(object):
             >>> campaign.reload()
 
         :param str query: keyword to search for.
+        :param list index: :class:`str` or :class:`list` of the indexes you want to get returned.
+            E.g. ``index=['campaigns', 'domains']``.
         :return: dict with list of :mod:`.models` as values
         """
+        params = {'q': query}
+        if index:
+            if isinstance(index, list):
+                index = ','.join(index)
+            params['index'] = index
         r = requests.get(self.api_endpoint + 'search',
-                         params={'q': query},
+                         params=params,
                          headers=self._auth_header)
         r_json = r.json()
         if not r.ok:
@@ -133,7 +140,7 @@ class Atomx(object):
         for m in search_result.keys():
             model_name = get_model_name(m)
             if model_name:
-                search_result[m] = [getattr(models, model_name)(self, **v)
+                search_result[m] = [getattr(models, model_name)(session=self, **v)
                                     for v in search_result[m]]
         return search_result
 
