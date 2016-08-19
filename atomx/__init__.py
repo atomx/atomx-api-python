@@ -429,3 +429,7 @@ class Atomx(object):
     def create(self, model):
         """Alias for :meth:`.models.AtomxModel.create` with `session` argument."""
         return model.create(self)
+
+    def remove(self, model):
+        """Alias for :meth:`.models.AtomxModel.delete` with `session` argument."""
+        return model.delete(self)

@@ -54,6 +54,10 @@ class AtomxModel(object):
         from atomx.utils import get_attribute_model_name
         model_name = get_attribute_model_name(item)
         attr = self._attributes.get(item)
+
+        # loading of extra data is only possible if model ID is known
+        if 'id' not in self._attributes:
+            raise AttributeError('Model needs at least an `id` value to load more attributes.')
         # if requested attribute item is a valid model name and and int or
         # a list of integers, just delete the attribute so it gets
         # fetched from the api
@@ -161,11 +165,28 @@ class AtomxModel(object):
         return self
 
     def delete(self, session=None):
-        """Delete is currently not supported by the api.
-        Set `state` to `INACTIVE` to deactivate it.
+        """`DELETE` the model in the api.
+        A `deleted` attribute is to ``True`` on ``self`` so you can check if a
+        :class:`.AtomxModel` is deleted or not.
+
+        .. warning::
+
+            Calling this method will permanently remove this model from the API.
+
+        :param session: The :class:`atomx.Atomx` session to use for the api call.
+            (Optional if you specified a `session` at initialization)
+        :return: A ``dict`` of all models that the API removed.
+            Keys are the model names and values are a list of IDs.
+        :rtype: :class:`dict`
         """
-        raise NotImplementedError("Delete is currently not supported by the api."
-                                  "Set `state` to `INACTIVE` to deactivate it.")
+        session = session or self.session
+        if not session:
+            raise NoSessionError
+        res = session.delete(self._resource_name, self.id)
+
+        # set a deleted attribute
+        self._attributes['deleted'] = True
+        return res
 
     def reload(self, session=None):
         """Reload the model from the api and update attributes with the response.

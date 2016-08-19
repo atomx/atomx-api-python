@@ -1,8 +1,10 @@
-1.5.1 (unreleased)
-------------------
+1.6 (unreleased)
+----------------
 
 - :meth:`atomx.Atomx.login` takes ``totp`` parameter for users that have 2-factor auth enabled.
 - :meth:`atomx.Atomx.search` takes ``index`` parameter to only search specific models.
+- Add support to remove models from the API. See :meth:`atomx.models.AtomxModel.delete`.
+- Add :meth:`atomx.Atomx.remove`.
 
 1.5
 ---
