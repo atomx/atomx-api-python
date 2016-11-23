@@ -59,7 +59,7 @@ def model_name_to_rest(name):
     resource name for the atomx api.
     E.g.::
 
-        >>> assert model_name_to_rest('ConversionPixels') ==  'conversion-pixels'
+        >>> assert model_name_to_rest('ConversionPixels') == 'conversion-pixels'
         >>> assert model_name_to_rest('OperatingSystem') == 'operating-system'
         >>> assert model_name_to_rest('Advertiser') == 'advertiser'
 

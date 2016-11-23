@@ -15,13 +15,14 @@ from atomx.exceptions import (
     NoPandasInstalledError,
 )
 
-__all__ = ['AccountManager', 'Advertiser', 'Bidder', 'Browser',
-           'CampaignDebugReason', 'Campaign', 'Category', 'ConnectionType',
+# pylint: disable=undefined-all-variable
+__all__ = ['AccountManager', 'Advertiser', 'App', 'Appstore', 'Bidder', 'Browser',  # noqa
+           'CampaignDebugReason', 'Campaign', 'Category', 'ConnectionType', 'City',
            'ConversionPixel', 'Country', 'Creative', 'CreativeAttribute',
-           'Datacenter', 'DeviceType', 'Domain', 'Fallback', 'Isp', 'Languages', 'Network',
+           'Datacenter', 'DeviceType', 'Domain', 'Dma', 'Fallback', 'Isp', 'Languages', 'Network',
            'OperatingSystem', 'Placement', 'PlacementType', 'Profile', 'Publisher', 'Reason',
            'Segment', 'SellerProfile', 'Site', 'Size', 'User', 'Visibility',
-           'Report']
+           'Report', 'Zipcode']  # noqa
 
 
 class AtomxModel(object):

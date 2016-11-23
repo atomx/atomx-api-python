@@ -6,6 +6,13 @@
 - Add support to remove models from the API. See :meth:`atomx.models.AtomxModel.delete`.
 - Add :meth:`atomx.Atomx.remove`.
 - Add ``save`` parameter to :meth:`atomx.Atomx.report`.
+- Add new models:
+
+  * :class:`atomx.models.App`
+  * :class:`atomx.models.Appstore`
+  * :class:`atomx.models.City`
+  * :class:`atomx.models.Dma`
+  * :class:`atomx.models.Zipcode`
 
 1.5
 ---
