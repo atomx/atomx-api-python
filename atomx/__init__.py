@@ -146,7 +146,7 @@ class Atomx(object):
 
     def report(self, scope=None, groups=None, metrics=None, where=None, from_=None, to=None,
                timezone='UTC', emails=None, when=None, interval=None, name=None,
-               sort=None, limit=None, offset=None):
+               sort=None, limit=None, offset=None, save=True):
         """Create a report.
 
         See the `reporting atomx wiki <https://wiki.atomx.com/reporting>`_
@@ -162,7 +162,7 @@ class Atomx(object):
             An expression list is in the form of ``[column, op, value]``:
 
                 - ``column`` can be any of the ``groups`` or ``metrics`` parameter columns.
-                - ``op`` can be any of ``==``, ``!=``, ``in`` or ``not in`` as a string.
+                - ``op`` can be any of ``==``, ``!=``, ``<``, ``>``, ``in`` or ``not in`` as a string.
                 - ``value`` is either a number or in case of ``in``
                   and ``not in`` a list of numbers.
 
@@ -181,9 +181,10 @@ class Atomx(object):
         :param str or list sort: List of columns to sort by.
         :param int limit: Number of rows to return
         :param int offset: Number of rows to skip.
+        :param bool save: Should the report appear in the users report history (defaults to `True`).
         :return: A :class:`atomx.models.Report` model
         """
-        report_json = {'timezone': timezone}
+        report_json = {'timezone': timezone, 'save': save}
 
         if name:
             report_json['name'] = name

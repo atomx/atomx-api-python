@@ -5,6 +5,7 @@
 - :meth:`atomx.Atomx.search` takes ``index`` parameter to only search specific models.
 - Add support to remove models from the API. See :meth:`atomx.models.AtomxModel.delete`.
 - Add :meth:`atomx.Atomx.remove`.
+- Add ``save`` parameter to :meth:`atomx.Atomx.report`.
 
 1.5
 ---
