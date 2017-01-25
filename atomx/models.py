@@ -20,9 +20,9 @@ __all__ = ['AccountManager', 'Advertiser', 'App', 'Appstore', 'Bidder', 'Browser
            'CampaignDebugReason', 'Campaign', 'Category', 'ConnectionType', 'City',
            'ConversionPixel', 'Country', 'Creative', 'CreativeAttribute',
            'Datacenter', 'DeviceType', 'Domain', 'Dma', 'Fallback', 'Isp', 'Languages', 'Network',
-           'OperatingSystem', 'Placement', 'PlacementType', 'Profile', 'Publisher', 'Reason',
-           'Segment', 'SellerProfile', 'Site', 'Size', 'User', 'Visibility',
-           'Report', 'Zipcode']  # noqa
+           'OperatingSystem', 'Placement', 'PlacementType', 'PriceModel', 'Profile', 'Publisher',
+           'Reason', 'Report', 'Segment', 'SellerProfile', 'Site', 'Size',
+           'Timezone', 'User', 'Visibility', 'Zipcode']  # noqa
 
 
 class AtomxModel(object):

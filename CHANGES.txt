@@ -1,5 +1,5 @@
-1.6 (unreleased)
-----------------
+1.6
+---
 
 - :meth:`atomx.Atomx.login` takes ``totp`` parameter for users that have 2-factor auth enabled.
 - :meth:`atomx.Atomx.search` takes ``index`` parameter to only search specific models.
@@ -12,6 +12,8 @@
   * :class:`atomx.models.Appstore`
   * :class:`atomx.models.City`
   * :class:`atomx.models.Dma`
+  * :class:`atomx.models.PriceModel`
+  * :class:`atomx.models.Timezone`
   * :class:`atomx.models.Zipcode`
 
 1.5
