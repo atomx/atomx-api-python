@@ -1,3 +1,9 @@
+1.7 (unreleased)
+---------------
+
+- Add ``editable`` parameter to :meth:`atomx.Atomx.report`.
+
+
 1.6
 ---
 

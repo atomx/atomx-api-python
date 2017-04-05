@@ -146,7 +146,7 @@ class Atomx(object):
 
     def report(self, scope=None, groups=None, metrics=None, where=None, from_=None, to=None,
                timezone='UTC', emails=None, when=None, interval=None, name=None,
-               sort=None, limit=None, offset=None, save=True):
+               sort=None, limit=None, offset=None, save=True, editable=False):
         """Create a report.
 
         See the `reporting atomx wiki <https://wiki.atomx.com/reporting>`_
@@ -182,9 +182,10 @@ class Atomx(object):
         :param int limit: Number of rows to return
         :param int offset: Number of rows to skip.
         :param bool save: Should the report appear in the users report history (defaults to `True`).
+        :param bool editable: Should other users be able to change the date range of this report.
         :return: A :class:`atomx.models.Report` model
         """
-        report_json = {'timezone': timezone, 'save': save}
+        report_json = {'timezone': timezone, 'save': save, 'editable': editable}
 
         if name:
             report_json['name'] = name
