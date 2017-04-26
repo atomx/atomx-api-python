@@ -4,6 +4,7 @@
 - Add ``editable`` parameter to :meth:`atomx.Atomx.report`.
 - Add ``dsp`` reporting scope.
 - Add ``daterange`` parameter to :meth:`atomx.Atomx.report`.
+- :meth:`atomx.models.AtomxModel.reload` takes kwargs parameter
 
 
 1.6

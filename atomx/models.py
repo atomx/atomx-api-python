@@ -189,7 +189,7 @@ class AtomxModel(object):
         self._attributes['deleted'] = True
         return res
 
-    def reload(self, session=None):
+    def reload(self, session=None, **kwargs):
         """Reload the model from the api and update attributes with the response.
 
         This is useful if you have not all attributes loaded like when you made
@@ -206,7 +206,7 @@ class AtomxModel(object):
         if not hasattr(self, 'id'):
             raise ModelNotFoundError("Can't reload without 'id' parameter. "
                                      "Forgot to save() first?")
-        res = session.get(self._resource_name, self.id)
+        res = session.get(self._resource_name, self.id, **kwargs)
         self.__init__(session=session, **res.json)
         return self
 
