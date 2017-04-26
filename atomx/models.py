@@ -56,9 +56,6 @@ class AtomxModel(object):
         model_name = get_attribute_model_name(item)
         attr = self._attributes.get(item)
 
-        # loading of extra data is only possible if model ID is known
-        if 'id' not in self._attributes:
-            raise AttributeError('Model needs at least an `id` value to load more attributes.')
         # if requested attribute item is a valid model name and and int or
         # a list of integers, just delete the attribute so it gets
         # fetched from the api
@@ -70,6 +67,9 @@ class AtomxModel(object):
         # if item not in model and session exists,
         # try to load model attribute from server if possible
         if not item.startswith('_') and item not in self._attributes and self.session:
+            # loading of extra data is only possible if model ID is known
+            if 'id' not in self._attributes:
+                raise AttributeError('Model needs at least an `id` value to load more attributes.')
             try:
                 v = self.session.get(self.__class__._resource_name, self.id, item)
                 self._attributes[item] = v
