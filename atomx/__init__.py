@@ -144,8 +144,9 @@ class Atomx(object):
                                     for v in search_result[m]]
         return search_result
 
-    def report(self, scope=None, groups=None, metrics=None, where=None, from_=None, to=None,
-               timezone='UTC', emails=None, when=None, interval=None, name=None,
+    def report(self, scope=None, groups=None, metrics=None, where=None,
+               from_=None, to=None, daterange=None, timezone='UTC',
+               emails=None, when=None, interval=None, name=None,
                sort=None, limit=None, offset=None, save=True, editable=False):
         """Create a report.
 
@@ -153,7 +154,8 @@ class Atomx(object):
         for details about parameters and available groups, metrics.
 
         :param str scope: Specifies the report type. Should be one of:
-            'advertiser', 'publisher', 'network_managed', 'network_buy', 'network_sell'.
+            'advertiser', 'publisher', 'inventory', 'dsp',
+            'network_managed', 'network_buy', 'network_sell'.
             If undefined it tries to determine the `scope` automatically based
             on the access rights of the api user.
         :param list groups: columns to group by.
@@ -167,10 +169,15 @@ class Atomx(object):
                   and ``not in`` a list of numbers.
 
         :param datetime.datetime from_: :class:`datetime.datetime` where the report
-            should start (inclusive). (defaults to last week)
+            should start (inclusive). (Defaults to last week)
         :param datetime.datetime to: :class:`datetime.datetime` where the report
-            should end (exclusive). (defaults to `datetime.now()` if undefined)
-        :param str timezone:  Timezone used for all times. (defaults to `UTC`)
+            should end (exclusive). (Defaults to `datetime.now()` if undefined)
+        :param str daterange: Use :param:`daterange` to automatically set the reports
+        `from` and `to` parameters relativ to the current date.
+        Both :param:`from_` and :param:`to` have to be ``None`` for it.
+        Dateranges are: today, yesterday, last7days, last14days, last30days, monthtodate,
+                        lastmonth, yeartodate, lifetime. (Defaults to ``None``)
+        :param str timezone:  Timezone used for all times. (Defaults to `UTC`)
             For a supported list see https://wiki.atomx.com/timezones
         :param emails: One or multiple email addresses that should get
             notified once the report is finished and ready to download.
@@ -217,7 +224,9 @@ class Atomx(object):
             report_json['when'] = when
             report_json['interval'] = interval
 
-        else:  # normal report
+        elif not from_ and not to and daterange:  # Rolling report
+            report_json['daterange'] = daterange
+        else:  # Normal report
             if from_ is None:
                 from_ = datetime.now() - timedelta(days=7)
             if isinstance(from_, datetime):

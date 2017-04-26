@@ -2,6 +2,8 @@
 ---------------
 
 - Add ``editable`` parameter to :meth:`atomx.Atomx.report`.
+- Add ``dsp`` reporting scope.
+- Add ``daterange`` parameter to :meth:`atomx.Atomx.report`.
 
 
 1.6
@@ -21,6 +23,7 @@
   * :class:`atomx.models.PriceModel`
   * :class:`atomx.models.Timezone`
   * :class:`atomx.models.Zipcode`
+
 
 1.5
 ---
