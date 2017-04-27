@@ -242,7 +242,7 @@ class Report(object):
 
     def __init__(self, id, query=None, name=None, emails=None, length=None, totals=None,
                  columns=None, created_at=None, data=None, user_id=None, session=None,
-                 is_scheduled_report=False, **kwargs):
+                 is_scheduled_report=False, to=None, from_=None, **kwargs):
         self.session = session
         self.id = id
         self.user_id = user_id
@@ -252,9 +252,16 @@ class Report(object):
         self.data = data
         self.length = length
         self.totals = totals
+        self.to = to
+        self.from_ = from_ or kwargs.get('from')
         self.columns = columns
         self.created_at = created_at
         self.is_scheduled_report = is_scheduled_report
+
+        if self.to:
+            self.to = datetime.strptime(self.to, '%Y-%m-%d %H:00:00')
+        if self.from_:
+            self.from_ = datetime.strptime(self.from_, '%Y-%m-%d %H:00:00')
 
     def __repr__(self):
         return "Report(created_at={}, query={})".format(self.created_at, self.query)
