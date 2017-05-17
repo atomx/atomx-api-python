@@ -5,6 +5,7 @@
 - Add ``dsp`` reporting scope.
 - Add ``daterange`` parameter to :meth:`atomx.Atomx.report`.
 - :meth:`atomx.models.AtomxModel.reload` takes kwargs parameter
+- :meth:`atomx.Atomx.delete` can take a `atomx.models` instance as argument
 
 
 1.6

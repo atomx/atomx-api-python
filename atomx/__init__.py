@@ -418,6 +418,8 @@ class Atomx(object):
             delete request.
         :return: message or resource returned by the api.
         """
+        if hasattr(resource, '_resource_name') and hasattr(resource, 'id'):
+            resource = '{}/{}'.format(resource._resource_name, resource.id)
         resource = resource.strip('/')
         for a in args:
             resource += '/' + str(a)
