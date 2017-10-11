@@ -6,6 +6,11 @@
 - Add ``daterange`` parameter to :meth:`atomx.Atomx.report`.
 - :meth:`atomx.models.AtomxModel.reload` takes kwargs parameter
 - :meth:`atomx.Atomx.delete` can take a `atomx.models` instance as argument
+- Add new models:
+
+  * :class:`atomx.models.Dsp`
+  * :class:`atomx.models.Ssp`
+  * :class:`atomx.models.SspResultType`
 
 
 1.6

@@ -19,9 +19,9 @@ from atomx.exceptions import (
 __all__ = ['AccountManager', 'Advertiser', 'App', 'Appstore', 'Bidder', 'Browser',  # noqa
            'CampaignDebugReason', 'Campaign', 'Category', 'ConnectionType', 'City',
            'ConversionPixel', 'Country', 'Creative', 'CreativeAttribute',
-           'Datacenter', 'DeviceType', 'Domain', 'Dma', 'Fallback', 'Isp', 'Languages', 'Network',
+           'Datacenter', 'DeviceType', 'Domain', 'Dma', 'Dsp', 'Fallback', 'Isp', 'Languages', 'Network',
            'OperatingSystem', 'Placement', 'PlacementType', 'PriceModel', 'Profile', 'Publisher',
-           'Reason', 'Report', 'Segment', 'SellerProfile', 'Site', 'Size',
+           'Reason', 'Report', 'Segment', 'SellerProfile', 'Site', 'Size', 'Ssp', 'SspResultType',
            'Timezone', 'User', 'Visibility', 'Zipcode']  # noqa
 
 
