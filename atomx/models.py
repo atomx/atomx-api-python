@@ -33,6 +33,7 @@ class AtomxModel(object):
     :param attributes: model attributes
     """
     def __init__(self, id=None, session=None, **attributes):
+        from atomx.utils import get_attribute_model_name
         for k, v in attributes.items():
             if k.endswith('_at'):
                 try:
@@ -44,6 +45,7 @@ class AtomxModel(object):
                     attributes[k] = datetime.strptime(v, '%Y-%m-%d')
                 except (ValueError, TypeError):
                     pass
+
         if id is not None:
             attributes['id'] = id
 
@@ -63,6 +65,12 @@ class AtomxModel(object):
                            isinstance(attr, list) and len(attr) > 0 and
                            isinstance(attr[0], int)):
             del self._attributes[item]
+        elif model_name:
+            Model = globals()[model_name]
+            if isinstance(attr, list) and len(attr) > 0 and isinstance(attr[0], dict):
+                return [Model(session=self.session, **a) for a in attr]
+            elif isinstance(attr, dict):
+                return Model(session=self.session, **attr)
 
         # if item not in model and session exists,
         # try to load model attribute from server if possible
