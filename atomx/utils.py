@@ -36,7 +36,9 @@ def get_model_name(name):
         model_name = name.capitalize()
 
     if model_name.endswith('ies'):  # change e.g. Countries to Countr*y*
-        model_name = model_name[:-3]+'y'
+        model_name = model_name[:-3] + 'y'
+    if model_name in ['Suspicious', 'SspSuspicious']:
+        return 'SspSuspicious'
     else:
         model_name = model_name.rstrip('s')
     if model_name in dir(models):
@@ -51,6 +53,8 @@ def get_attribute_model_name(attribute):
     :param str attribute: attribute name to convert
     :return: name of the model or False
     """
+    if attribute.lower() == 'suspicious':
+        return 'SspSuspicious'
     return get_model_name(re.sub('(_filter|_include|_exclude)$', '', attribute))
 
 

@@ -10,6 +10,7 @@
 
   * :class:`atomx.models.Dsp`
   * :class:`atomx.models.Ssp`
+  * :class:`atomx.models.SspSuspicious`
   * :class:`atomx.models.SspResultType`
 
 

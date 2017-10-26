@@ -22,7 +22,7 @@ __all__ = ['AccountManager', 'Advertiser', 'App', 'Appstore', 'Bidder', 'Browser
            'Datacenter', 'DeviceType', 'Domain', 'Dma', 'Dsp', 'Fallback', 'Isp', 'Languages', 'Network',
            'OperatingSystem', 'Placement', 'PlacementType', 'PriceModel', 'Profile', 'Publisher',
            'Reason', 'Report', 'Segment', 'SellerProfile', 'Site', 'Size', 'Ssp', 'SspResultType',
-           'Timezone', 'User', 'Visibility', 'Zipcode']  # noqa
+           'SspSuspicious', 'Timezone', 'User', 'Visibility', 'Zipcode']  # noqa
 
 
 class AtomxModel(object):
