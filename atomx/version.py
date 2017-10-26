@@ -1,2 +1,2 @@
-VERSION = '1.7b'
+VERSION = '1.7'
 API_VERSION = 'v3'
